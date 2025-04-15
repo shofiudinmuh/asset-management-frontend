@@ -1,4 +1,4 @@
-const Input = ({
+const InputField = ({
     type = 'text',
     id,
     name,

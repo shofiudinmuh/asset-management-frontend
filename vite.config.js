@@ -7,4 +7,8 @@ export default defineConfig({
     resolve: {
         extensions: ['.js', '.jsx'],
     },
+    server: {
+        host: 'localhost',
+        port: 3000,
+    },
 });

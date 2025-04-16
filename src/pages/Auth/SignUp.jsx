@@ -6,7 +6,7 @@ export default function SignUp() {
     return (
         <>
             <PageMeta
-                title='Register | JNE Asset & Resource Management System'
+                title='Register | Asset & Resource Management System'
                 description='Aplikasi manajemen aset dan sumber daya perusahaan'
             />
 

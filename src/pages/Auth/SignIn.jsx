@@ -6,7 +6,7 @@ export default function SignIn() {
     return (
         <>
             <PageMeta
-                title='Login | JNE Asset & Resource Management System'
+                title='Login | Asset & Resource Management System'
                 description='Aplikasi manajemen aset dan sumber daya perusahaan'
             />
 

@@ -1,16 +1,16 @@
 import { useSidebar } from '../../contexts/SidebarContext';
 
-const { useEffect } = require('react');
-const { useRef } = require('react');
-const { useState } = require('react');
-const { FiX, FiMenu, FiMoreVertical, FiSearch, FiCommand } = require('react-icons/fi');
-const { Link } = require('react-router-dom');
-const { ThemeToggleButton } = require('../common/ThemeToggleButton');
-const { default: NotificationDropdown } = require('../header/NotificationDropdown');
+import { useEffect } from 'react';
+import { useRef } from 'react';
+import { useState } from 'react';
+import { FiX, FiMenu, FiMoreVertical, FiSearch, FiCommand } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { ThemeToggleButton } from '../common/ThemeToggleButton';
+import NotificationDropdown from '../header/NotificationDropdown';
 
 const AppHeader = () => {
     const [isApplicationMenuOpen, setIsApplicationMenuOpen] = useState(false);
-    const [isMobileOpen, toggleSidebar, toggleMobileSidebar] = useSidebar();
+    const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
     const inputRef = useRef(null);
 
     const handleToggle = () => {
@@ -40,11 +40,11 @@ const AppHeader = () => {
     }, []);
 
     return (
-        <header className='sticky top-0 flex- w-full bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b'>
+        <header className='sticky top-0 flex w-full bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b'>
             <div className='flex flex-col items-center justify-between grow lg:flex-row lg:px-6'>
                 <div className='flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:py-4'>
                     <button
-                        className='items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border'
+                        className='items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-50 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border'
                         onClick={handleToggle}
                         aria-label='Toggle Sidebar'>
                         {isMobileOpen ? (
@@ -61,7 +61,7 @@ const AppHeader = () => {
 
                     <button
                         onClick={toggleApplicationMenu}
-                        className='flex items-center justify-center w-10 h-10 text-gray-700 rounded-lg z-99999 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden'>
+                        className='flex items-center justify-center w-10 h-10 text-gray-700 rounded-lg z-40 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden'>
                         <FiMoreVertical className='w-6 h-6' />
                     </button>
 

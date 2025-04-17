@@ -1,11 +1,6 @@
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { Children } from 'react';
-import { useContext } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
-const { createContext } = require('react');
-
-const SidebarContext = createContext();
+const SidebarContext = createContext(undefined);
 
 export const useSidebar = () => {
     const context = useContext(SidebarContext);
@@ -16,7 +11,7 @@ export const useSidebar = () => {
 };
 
 export const SidebarProvider = ({ children }) => {
-    const [isExpaned, setIsExpaned] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(true);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
@@ -41,21 +36,21 @@ export const SidebarProvider = ({ children }) => {
     }, []);
 
     const toggleSidebar = () => {
-        setIsExpaned((prev) => !prev);
+        setIsExpanded((prev) => !prev);
     };
 
     const toggleMobileSidebar = () => {
         setIsMobileOpen((prev) => !prev);
     };
 
-    const toggleSubmenu = () => {
+    const toggleSubmenu = (item) => {
         setOpenSubmenu((prev) => (prev === item ? null : item));
     };
 
     return (
         <SidebarContext.Provider
             value={{
-                isExpaned: isMobile ? false : isExpaned,
+                isExpanded: isMobile ? false : isExpanded,
                 isMobileOpen,
                 isHovered,
                 activeItem,

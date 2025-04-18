@@ -92,10 +92,7 @@ const AppSidebar = () => {
                 if (nav.subItems) {
                     nav.subItems.forEach((subItem) => {
                         if (isActive(subItem.path)) {
-                            setOpenSubMenu({
-                                type: menuType,
-                                index,
-                            });
+                            setOpenSubMenu({ type: menuType, index });
                             submenuMatched = true;
                         }
                     });
@@ -103,17 +100,15 @@ const AppSidebar = () => {
             });
         });
 
-        if (!submenuMatched) {
-            setOpenSubMenu(null);
-        }
+        if (!submenuMatched) setOpenSubMenu(null);
     }, [location, isActive]);
 
     useEffect(() => {
         if (openSubMenu !== null) {
             const key = `${openSubMenu.type}-${openSubMenu.index}`;
             if (subMenuRefs.current[key]) {
-                setSubMenuHeight((prevHeights) => ({
-                    ...prevHeights,
+                setSubMenuHeight((prev) => ({
+                    ...prev,
                     [key]: subMenuRefs.current[key]?.scrollHeight || 0,
                 }));
             }
@@ -121,16 +116,9 @@ const AppSidebar = () => {
     }, [openSubMenu]);
 
     const handleSubmenuToggle = (index, menuType) => {
-        setOpenSubMenu((prevOpenSubmenu) => {
-            if (
-                prevOpenSubmenu &&
-                prevOpenSubmenu.type === menuType &&
-                prevOpenSubmenu.index === index
-            ) {
-                return null;
-            }
-            return { type: menuType, index };
-        });
+        setOpenSubMenu((prev) =>
+            prev?.type === menuType && prev?.index === index ? null : { type: menuType, index }
+        );
     };
 
     const renderMenuItems = (items, menuType) => {
@@ -145,8 +133,8 @@ const AppSidebar = () => {
                                     className={`flex items-center w-full p-3 rounded-lg transition-colors ${
                                         openSubMenu?.type === menuType &&
                                         openSubMenu?.index === index
-                                            ? 'bg-blue-50 text-blue-600'
-                                            : 'hover:bg-gray-100'
+                                            ? 'bg-blue-50 text-blue-600 dark:bg-gray-700 dark:text-white'
+                                            : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300'
                                     } ${
                                         !isExpanded && !isHovered
                                             ? 'justify-center'
@@ -157,8 +145,8 @@ const AppSidebar = () => {
                                             className={`text-lg ${
                                                 openSubMenu?.type === menuType &&
                                                 openSubMenu?.index === index
-                                                    ? 'text-blue-600'
-                                                    : 'text-gray-600'
+                                                    ? 'text-blue-600 dark:text-white'
+                                                    : 'text-gray-600 dark:text-gray-300'
                                             }`}>
                                             {nav.icon}
                                         </span>
@@ -171,8 +159,8 @@ const AppSidebar = () => {
                                             className={`transition-transform duration-200 ${
                                                 openSubMenu?.type === menuType &&
                                                 openSubMenu?.index === index
-                                                    ? 'rotate-180 text-blue-600'
-                                                    : 'text-gray-400'
+                                                    ? 'rotate-180 text-blue-600 dark:text-white'
+                                                    : 'text-gray-400 dark:text-gray-300'
                                             }`}
                                         />
                                     )}
@@ -200,8 +188,8 @@ const AppSidebar = () => {
                                                         to={subItem.path}
                                                         className={`block px-3 py-2 rounded-lg text-sm ${
                                                             isActive(subItem.path)
-                                                                ? 'bg-blue-50 text-blue-600'
-                                                                : 'hover:bg-gray-100 text-gray-600'
+                                                                ? 'bg-blue-50 text-blue-600 dark:bg-gray-700 dark:text-white'
+                                                                : 'hover:bg-gray-100 text-gray-600 dark:hover:bg-gray-800 dark:text-gray-300'
                                                         }`}>
                                                         {subItem.name}
                                                     </Link>
@@ -216,8 +204,8 @@ const AppSidebar = () => {
                                 to={nav.path}
                                 className={`flex items-center p-3 rounded-lg transition-colors ${
                                     isActive(nav.path)
-                                        ? 'bg-blue-50 text-blue-600'
-                                        : 'hover:bg-gray-100 text-gray-600'
+                                        ? 'bg-blue-50 text-blue-600 dark:bg-gray-700 dark:text-white'
+                                        : 'hover:bg-gray-100 text-gray-600 dark:hover:bg-gray-800 dark:text-gray-300'
                                 } ${!isExpanded && !isHovered ? 'justify-center' : 'pl-3'}`}>
                                 <span className='text-lg'>{nav.icon}</span>
                                 {(isExpanded || isHovered || isMobileOpen) && (
@@ -233,57 +221,50 @@ const AppSidebar = () => {
 
     return (
         <aside
-            className={`fixed  flex flex-col lg:mt-0 top-0 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-                ${isExpanded || isHovered || isMobileOpen ? 'w-[290px]' : 'w-[90px]'}
-                ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-                lg:translate-x-0`}
+            className={`fixed flex flex-col lg:mt-0 top-0 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 dark:text-white h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+            ${isExpanded || isHovered || isMobileOpen ? 'w-[290px]' : 'w-[90px]'} 
+            ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} 
+            lg:translate-x-0`}
             onMouseEnter={() => !isExpanded && setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}>
-            {/* Logo Section - Fixed padding regardless of state */}
             <div className='py-8 px-5'>
                 <Link to='/'>
-                    <div className='flex items-center'>
-                        {/* Always show icon version */}
-                        <img
-                            src='/images/logo/logo-icon.svg'
-                            alt='Logo'
-                            width={32}
-                            height={32}
-                            className={`${
-                                isExpanded || isHovered || isMobileOpen ? 'hidden' : 'block'
-                            }`}
-                        />
-                        {/* Show full logo when expanded */}
-                        <div
-                            className={`${
-                                isExpanded || isHovered || isMobileOpen ? 'block' : 'hidden'
-                            }`}>
+                    <div className='flex items-center space-x-2'>
+                        {!isExpanded && !isHovered && !isMobileOpen ? (
+                            <>
+                                <img
+                                    className='dark:hidden'
+                                    src='/images/logo/logo.svg'
+                                    alt='Logo'
+                                    width={150}
+                                    height={40}
+                                />
+                                <img
+                                    className='hidden dark:block'
+                                    src='/images/logo/logo-dark.svg'
+                                    alt='Logo'
+                                    width={150}
+                                    height={40}
+                                />
+                            </>
+                        ) : (
                             <img
-                                className='dark:hidden'
-                                src='/images/logo/logo.svg'
+                                src='/images/logo/logo-icon.svg'
                                 alt='Logo'
-                                width={150}
-                                height={40}
+                                width={32}
+                                height={32}
                             />
-                            <img
-                                className='hidden dark:block'
-                                src='/images/logo/logo-dark.svg'
-                                alt='Logo'
-                                width={150}
-                                height={40}
-                            />
-                        </div>
+                        )}
                     </div>
                 </Link>
             </div>
 
-            {/* Menu Content - with consistent padding */}
             <div className='flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar px-5'>
                 <nav className='mb-6'>
                     <div className='flex flex-col gap-4'>
                         <div>
                             <h2
-                                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 dark:text-gray-300 ${
                                     !isExpanded && !isHovered
                                         ? 'lg:justify-center'
                                         : 'justify-start'
@@ -298,7 +279,7 @@ const AppSidebar = () => {
                         </div>
                         <div className='flex flex-col gap-4'>
                             <h2
-                                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 dark:text-gray-300 ${
                                     !isExpanded && !isHovered
                                         ? 'lg:justify-center'
                                         : 'justify-start'

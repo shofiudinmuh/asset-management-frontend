@@ -10,7 +10,7 @@ import { useModal } from '../../hooks/useModal';
 import { PiEyeClosed } from 'react-icons/pi';
 import { FaEye } from 'react-icons/fa';
 
-export default function User() {
+export default function UserPage() {
     const [users, setUsers] = useState([]);
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');

@@ -45,7 +45,7 @@ const Modal = ({
         <div className='fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999'>
             {!isFullScreen && (
                 <div
-                    className='fixed inset-0 h-full bg-gray-400/50 backdrop-blur[32px]'
+                    className='fixed inset-0 h-full bg-gray-400/50 backdrop-blur-[32px]'
                     onClick={onClose}></div>
             )}
             <div

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FiChevronDown, FiLogOut, FiUser } from 'react-icons/fi';
+import { FiChevronDown, FiHelpCircle, FiLogOut, FiSettings, FiUser } from 'react-icons/fi';
 import Dropdown from '../ui/Dropdown';
 import DropdownItem from '../ui/DropdownItem';
 import { Link } from 'react-router-dom';
@@ -21,7 +21,7 @@ export default function UserDropdown() {
                 onClick={toggleDropdown}
                 className='flex items-center text-gray-700 dropdown-toggle dark:text-hover-gray-400'>
                 <span className='mr-3 overflow-hidden rounded-full h-11 w-11'>
-                    <img src='/assets/images/user/owner.jpg' alt='User' />
+                    <img src='/images/user/owner.jpg' alt='User' />
                 </span>
                 <span className='block mr-1 font-medium text-theme-sm'>User</span>
                 <FiChevronDown

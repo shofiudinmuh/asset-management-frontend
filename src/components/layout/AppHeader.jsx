@@ -7,6 +7,7 @@ import { FiX, FiMenu, FiMoreVertical, FiSearch, FiCommand } from 'react-icons/fi
 import { Link } from 'react-router-dom';
 import { ThemeToggleButton } from '../common/ThemeToggleButton';
 import NotificationDropdown from '../header/NotificationDropdown';
+import UserDropdown from '../header/UserDropdown';
 
 const AppHeader = () => {
     const [isApplicationMenuOpen, setIsApplicationMenuOpen] = useState(false);
@@ -94,6 +95,7 @@ const AppHeader = () => {
                         <ThemeToggleButton />
                         <NotificationDropdown />
                     </div>
+                    <UserDropdown />
                 </div>
             </div>
         </header>

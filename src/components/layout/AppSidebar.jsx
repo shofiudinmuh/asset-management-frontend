@@ -231,6 +231,13 @@ const AppSidebar = () => {
                 <Link to='/'>
                     <div className='flex items-center space-x-2'>
                         {!isExpanded && !isHovered && !isMobileOpen ? (
+                            <img
+                                src='/images/logo/logo-icon.svg'
+                                alt='Logo'
+                                width={32}
+                                height={32}
+                            />
+                        ) : (
                             <>
                                 <img
                                     className='dark:hidden'
@@ -247,13 +254,6 @@ const AppSidebar = () => {
                                     height={40}
                                 />
                             </>
-                        ) : (
-                            <img
-                                src='/images/logo/logo-icon.svg'
-                                alt='Logo'
-                                width={32}
-                                height={32}
-                            />
                         )}
                     </div>
                 </Link>

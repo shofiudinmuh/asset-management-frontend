@@ -174,7 +174,7 @@ export default function LocationTable({ onEditLocation, data }) {
                     <div class='flex space-x-2'>
                         <button data-id="${row.id}" class="action-edit text-sm font-medium px-3 py-1 bg-brand-500 text-white rounded hover:bg-brand-700">Edit</button>
                         <button data-id="${row.id}" class="action-delete text-sm font-medium px-3 py-1 bg-error-500 text-white rounded hover:bg-error-700">Delete</button>
-                    `,
+                    </div>`,
                 },
             ],
             responsive: true,

@@ -5,6 +5,7 @@ import AppLayout from '../components/layout/AppLayout';
 import UserPage from '../pages/Users/UserPage';
 import LocationPage from '../pages/Locations/LocationPage';
 import SupplierPage from '../pages/Suppliers/SupplierPage';
+import AssetPage from '../pages/Asset/AssetPage';
 
 const AppRoutes = () => {
     return (
@@ -16,6 +17,7 @@ const AppRoutes = () => {
                 <Route path='/' element={<AppLayout />}>
                     <Route path='users' element={<UserPage />} />
                     <Route path='suppliers' element={<SupplierPage />} />
+                    <Route path='assets' element={<AssetPage />} />
                     <Route path='locations' element={<LocationPage />} />
                 </Route>
             </Routes>

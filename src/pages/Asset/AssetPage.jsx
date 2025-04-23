@@ -87,10 +87,10 @@ export default function AssetPage() {
 
             <PageBreadCrumb pageTitle='Assets' />
 
-            <div className='space y-2 px-2 mx-2 dark:bg-gray-800'>
+            <div className='space-y-2 px-2 mx-2 dark:bg-gray-800'>
                 <ComponentCard>
                     <button
-                        className='px-4 py-2 bg-brand-500 text-white rounded-md hocer:bg-blue-700 transition-colors'
+                        className='px-4 py-2 bg-brand-500 text-white rounded-md hover:bg-blue-700 transition-colors'
                         onClick={() => {
                             resetForm();
                             openModal();

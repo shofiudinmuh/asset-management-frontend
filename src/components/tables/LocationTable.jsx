@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import $ from 'jquery';
 import 'datatables.net';
-import 'datatables.net-dt/css/dataTables.dataTables.css';
+// import 'datatables.net-dt/css/dataTables.dataTables.css';
 
 const locationData = [
     {
@@ -203,7 +203,6 @@ export default function LocationTable({ onEditLocation, data }) {
                 const $table = $(tableRef.current);
 
                 $table.addClass('min-w-full text-sm text-left');
-
                 $table.find('thead').addClass('bg-gray-50 dark:bg-white/[0.03]');
                 $table
                     .find('thead th')
@@ -213,32 +212,29 @@ export default function LocationTable({ onEditLocation, data }) {
                     .addClass('px-5 py-4 text-sm text-gray-700 dark:text-gray-300');
                 $table.find('tbody tr').addClass('hover:bg-gray-100 dark:hover:bg-white/[0.05]');
 
-                // ✅ Search input
-                $('.dataTables_filter input')
-                    .addClass(
-                        'px-3 py-2 border rounded-md bg-white text-sm shadow-theme-xs text-gray-800 ' +
-                            'placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden ' +
-                            'focus:ring-3 focus:ring-brand-500/10 ' +
-                            'dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 ' +
-                            'dark:placeholder:text-white/30 dark:focus:border-brand-800'
-                    )
-                    .css('width', '250px');
+                $('.dataTables_filter input').addClass(
+                    'px-3 py-2 border rounded-md bg-white text-sm shadow-theme-xs text-gray-800 ' +
+                        'placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden ' +
+                        'focus:ring-3 focus:ring-brand-500/10 hover:border-brand-700 ' +
+                        'dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 ' +
+                        'dark:placeholder:text-white/30 dark:focus:border-brand-800 dark:hover:border-brand-700 !important'
+                );
 
-                // ✅ Length select
                 $('.dataTables_length select').addClass(
                     'px-2 py-1 border rounded-md text-sm text-gray-700 dark:text-gray-400 dark:bg-gray-800'
                 );
-
-                // ✅ Info text
                 $('.dataTables_info').addClass('text-sm text-gray-500 dark:text-gray-400');
 
-                // ✅ Pagination
                 const $paginate = $('.dataTables_paginate');
                 $paginate.addClass('text-sm dark:text-gray-300');
 
                 $paginate
                     .find('a')
-                    .addClass('px-3 py-1 rounded hover:bg-brand-500/10 transition-colors');
+                    .addClass(
+                        'px-3 py-1 rounded hover:bg-brand-500/10 hover:text-brand-700 transition-colors'
+                    );
+
+                $paginate.find('.current').addClass('bg-brand-500 text-white rounded');
             },
         });
         $(tableRef.current).on('click', '.action-delete', function () {

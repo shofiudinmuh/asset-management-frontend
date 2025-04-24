@@ -65,11 +65,11 @@ export default function MaintenancePage() {
 
     const handleEditMaintenance = (maintenance) => {
         setSelectedMaintenance(maintenance);
-        setMaintenanceName(maintenance.name);
+        setMaintenanceName(maintenance.asset.name);
         setMaintenanceDate(maintenance.maintenance_date);
         setMaintenanceDesc(maintenance.description);
         setMaintenanceCost(maintenance.cost);
-        setMaintenancePerson(maintenance.technician);
+        setMaintenancePerson(maintenance.technician.name);
         openModal();
     };
 
@@ -162,7 +162,7 @@ export default function MaintenancePage() {
                             PIC <span className='text-error-500'>*</span>
                         </Label>
                         <InputField
-                            type='number'
+                            type='text'
                             id='technician'
                             value={maintenancePerson}
                             placeholder='Enter person in charge'

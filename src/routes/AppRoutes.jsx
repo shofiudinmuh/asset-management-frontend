@@ -7,6 +7,7 @@ import LocationPage from '../pages/Locations/LocationPage';
 import SupplierPage from '../pages/Suppliers/SupplierPage';
 import AssetPage from '../pages/Asset/AssetPage';
 import MaintenancePage from '../pages/Maintenance/MaintenancePage';
+import PuchaseOrderPage from '../pages/PurchaseOrder/PurchaseOrderPage';
 
 const AppRoutes = () => {
     return (
@@ -21,6 +22,7 @@ const AppRoutes = () => {
                     <Route path='assets' element={<AssetPage />} />
                     <Route path='maintenances' element={<MaintenancePage />} />
                     <Route path='locations' element={<LocationPage />} />
+                    <Route path='purchase-orders' element={<PuchaseOrderPage />} />
                 </Route>
             </Routes>
         </Router>

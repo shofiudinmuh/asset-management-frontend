@@ -126,7 +126,7 @@ export default function MaintenanceTable({ onEditMaintenance, data }) {
                     render: (data, type, row) =>
                         `<div class='flex space-x-2'>
                             <button data-id='${row.id}' class='action-edit text-sm font-medium px-3 py-1 bg-brand-500 hover:bg-brand-700 text-white rounded'>Edit</button>
-                            <button data-id='${row.id}' class='action-delete text-sm font-medium px-3 py-1 bg-error-500 hover:bg-error-700 text-white rounded'>Edit</button>
+                            <button data-id='${row.id}' class='action-delete text-sm font-medium px-3 py-1 bg-error-500 hover:bg-error-700 text-white rounded'>Delete</button>
                             </div>
                             `,
                 },

@@ -11,6 +11,7 @@ import PuchaseOrderPage from '../pages/PurchaseOrder/PurchaseOrderPage';
 import TransactionPage from '../pages/Transaction/TransactionPage';
 import DocumentPage from '../pages/Documents/DocumentPage';
 import TransactionReportPage from '../pages/Reports/TransactionReportPage';
+import AssetReportPage from '../pages/Reports/AssetReportPage';
 
 const AppRoutes = () => {
     return (
@@ -29,6 +30,7 @@ const AppRoutes = () => {
                     <Route path='purchase-orders' element={<PuchaseOrderPage />} />
                     <Route path='documents' element={<DocumentPage />} />
                     <Route path='report/transaction' element={<TransactionReportPage />} />
+                    <Route path='report/asset' element={<AssetReportPage />} />
                 </Route>
             </Routes>
         </Router>

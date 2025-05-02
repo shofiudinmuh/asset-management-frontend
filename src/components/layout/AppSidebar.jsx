@@ -12,7 +12,7 @@ const navItems = [
     {
         icon: <FiGrid />,
         name: 'Dashboard',
-        path: '/',
+        path: '/dashboard',
     },
     {
         icon: <FiDatabase />,

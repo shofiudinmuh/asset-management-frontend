@@ -1,6 +1,8 @@
 import PageMeta from '../../components/common/PageMeta';
 import AssetManagementMetrics from '../../components/dashboard/AssetManagementMetrics';
 import AssetTransactionChart from '../../components/dashboard/AssetTransactionChart';
+import MonthlyAsset from '../../components/dashboard/MonthlyAsset';
+import StatisticsChart from '../../components/dashboard/StatisticsChart';
 
 export default function DashboardPage() {
     return (
@@ -12,6 +14,14 @@ export default function DashboardPage() {
                     <AssetManagementMetrics />
 
                     <AssetTransactionChart />
+                </div>
+
+                <div className='col-span-12 xl:col-span-5'>
+                    <MonthlyAsset />
+                </div>
+
+                <div className='col-span-12'>
+                    <StatisticsChart />
                 </div>
             </div>
         </>

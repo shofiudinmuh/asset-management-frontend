@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Label from '../form/Label';
 import InputField from '../form/input/InputField';
 import { FaEye, FaGoogle } from 'react-icons/fa';
@@ -10,6 +10,67 @@ import { FaXTwitter } from 'react-icons/fa6';
 export default function SignUpForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [formData, setFormData] = useState({
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+    });
+    const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const API_URL = process.env.REACT_APP_API_URL;
+    const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL;
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!isChecked) {
+            alert('Please agree to the Terms and Conditions!');
+            return;
+        }
+
+        setIsLoading(true);
+        setErrors({});
+
+        try {
+            // gabungkan first name dan last name
+            const userData = {
+                name: `${formData.first_name} ${formData.last_name}`.trim(),
+                email: formData.email,
+                password: formData.password,
+                password_confirmation: formData.password_confirmation,
+            };
+
+            const response = await axios.post(`${API_URL}/api/register`, userData);
+
+            if (response.data.success) {
+                alert('Register sucessfully!');
+                // redirect halaman login
+                window.location.href = `${FRONTEND_URL}/api/login`;
+            }
+        } catch (error) {
+            if (response.error && response.status === 422) {
+                // handle validation error
+                setErrors(error.response.data.errors);
+            } else {
+                console.log('Registrations error: ', error);
+                alert(error.response?.data?.message || 'Terjadi kesalahan saat registrasi!');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className='flex flex-col justify-center flex-1 w-full max-w-md mx-auto'>

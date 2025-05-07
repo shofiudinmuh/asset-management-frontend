@@ -5,12 +5,42 @@ import Label from '../form/Label';
 import InputField from '../form/input/InputField';
 import { PiEyeClosed } from 'react-icons/pi';
 import Checkbox from '../form/input/Checkbox';
-import { Link } from 'react-router-dom';
-import Button from '../ui/Button';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { authService } from '../../services/auth';
 
 export default function SignInForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const { login } = useAuth();
+    // const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    // const [error, setError] = useState('');
+
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         [name]: value,
+    //     }));
+    // };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError({});
+
+        try {
+            await login(email, password);
+            navigate('/dashboard');
+        } catch (err) {
+            setError('Email atau password salah.');
+        }
+    };
 
     return (
         <div className='flex flex-col flex-1'>
@@ -53,14 +83,24 @@ export default function SignInForm() {
                             </div>
                         </div>
 
-                        <form>
+                        <form onSubmit={handleSubmit}>
                             <div className='space-y-6'>
                                 <div>
                                     <Label>
                                         Email
                                         <span className='text-error-500'>*</span>{' '}
                                     </Label>
-                                    <InputField placeholder='info@mail.com' />
+                                    <InputField
+                                        type='email'
+                                        id='email'
+                                        name='email'
+                                        // value={formData.email}
+                                        value={email}
+                                        // onChange={handleChange}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder='info@mail.com'
+                                        required
+                                    />
                                 </div>
 
                                 <div>
@@ -72,6 +112,13 @@ export default function SignInForm() {
                                         <InputField
                                             type={showPassword ? 'text' : 'password'}
                                             placeholder='Enter your password'
+                                            name='password'
+                                            id='password'
+                                            // value={formData.password}
+                                            value={password}
+                                            // onChange={handleChange}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            required
                                         />
                                         <span
                                             onClick={() => setShowPassword(!showPassword)}
@@ -100,9 +147,12 @@ export default function SignInForm() {
                                 </div>
 
                                 <div>
-                                    <Button className='w-full' size='sm'>
-                                        Sign in
-                                    </Button>
+                                    <button
+                                        type='submit'
+                                        disabled={isLoading}
+                                        className='flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600'>
+                                        {isLoading ? 'Signing in...' : 'Sign In'}
+                                    </button>
                                 </div>
                             </div>
                         </form>

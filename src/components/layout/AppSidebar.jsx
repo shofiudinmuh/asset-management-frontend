@@ -7,6 +7,8 @@ import { RiLogoutBoxLine } from 'react-icons/ri';
 import { useSidebar } from '../../contexts/SidebarContext';
 import { Link, useLocation } from 'react-router-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const navItems = [
     {
@@ -81,6 +83,8 @@ const AppSidebar = () => {
     const [openSubMenu, setOpenSubMenu] = useState(null);
     const [subMenuHeight, setSubMenuHeight] = useState({});
     const subMenuRefs = useRef({});
+    const { logout } = useAuth();
+    const navigate = useNavigate();
 
     const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
 
@@ -199,6 +203,28 @@ const AppSidebar = () => {
                                     </div>
                                 )}
                             </>
+                        ) : nav.name === 'Logout' ? (
+                            <button
+                                onClick={async () => {
+                                    if (window.confirm('Apakah Anda yakin ingin logout?')) {
+                                        try {
+                                            await logout();
+                                            navigate('/login');
+                                        } catch (error) {
+                                            console.error('Logout gagal:', error);
+                                        }
+                                    }
+                                }}
+                                className={`flex items-center p-3 w-full text-left rounded-lg transition-colors ${
+                                    isActive(nav.path)
+                                        ? 'bg-blue-50 text-blue-600 dark:bg-gray-700 dark:text-white'
+                                        : 'hover:bg-gray-100 text-gray-600 dark:hover:bg-gray-800 dark:text-gray-300'
+                                } ${!isExpanded && !isHovered ? 'justify-center' : 'pl-3'}`}>
+                                <span className='text-lg'>{nav.icon}</span>
+                                {(isExpanded || isHovered || isMobileOpen) && (
+                                    <span className='ml-3'>{nav.name}</span>
+                                )}
+                            </button>
                         ) : (
                             <Link
                                 to={nav.path}

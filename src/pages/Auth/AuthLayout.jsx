@@ -21,7 +21,7 @@ const AuthLayout = ({ children }) => {
                                 />
                             </Link>
                             <p className='text-center text-gray-400 dark:text-white/60'>
-                                JNE Asset and Resource Management System
+                                Asset and Resource Management System
                             </p>
                         </div>
                     </div>

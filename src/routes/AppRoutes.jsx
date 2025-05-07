@@ -14,29 +14,35 @@ import TransactionReportPage from '../pages/Reports/TransactionReportPage';
 import AssetReportPage from '../pages/Reports/AssetReportPage';
 import MaintenanceReportPage from '../pages/Reports/MaintenanceReportPage';
 import DashboardPage from '../pages/Dashboard/DashboardPage';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import ProtectedRoute from './ProtectedRoute';
 
 const AppRoutes = () => {
     return (
         <Router>
-            <Routes>
-                <Route path='/' element={<SignIn />} />
-                <Route path='/register' element={<SignUp />} />
+            <AuthProvider>
+                <Routes>
+                    <Route path='/login' element={<SignIn />} />
+                    <Route path='/register' element={<SignUp />} />
 
-                <Route path='/' element={<AppLayout />}>
-                    <Route path='dashboard' element={<DashboardPage />} />
-                    <Route path='users' element={<UserPage />} />
-                    <Route path='suppliers' element={<SupplierPage />} />
-                    <Route path='assets' element={<AssetPage />} />
-                    <Route path='maintenances' element={<MaintenancePage />} />
-                    <Route path='locations' element={<LocationPage />} />
-                    <Route path='transactions' element={<TransactionPage />} />
-                    <Route path='purchase-orders' element={<PuchaseOrderPage />} />
-                    <Route path='documents' element={<DocumentPage />} />
-                    <Route path='report/transaction' element={<TransactionReportPage />} />
-                    <Route path='report/asset' element={<AssetReportPage />} />
-                    <Route path='report/maintenance' element={<MaintenanceReportPage />} />
-                </Route>
-            </Routes>
+                    <Route element={<ProtectedRoute />}>
+                        <Route path='/' element={<AppLayout />}>
+                            <Route path='dashboard' element={<DashboardPage />} />
+                            <Route path='users' element={<UserPage />} />
+                            <Route path='suppliers' element={<SupplierPage />} />
+                            <Route path='assets' element={<AssetPage />} />
+                            <Route path='maintenances' element={<MaintenancePage />} />
+                            <Route path='locations' element={<LocationPage />} />
+                            <Route path='transactions' element={<TransactionPage />} />
+                            <Route path='purchase-orders' element={<PuchaseOrderPage />} />
+                            <Route path='documents' element={<DocumentPage />} />
+                            <Route path='report/transaction' element={<TransactionReportPage />} />
+                            <Route path='report/asset' element={<AssetReportPage />} />
+                            <Route path='report/maintenance' element={<MaintenanceReportPage />} />
+                        </Route>
+                    </Route>
+                </Routes>
+            </AuthProvider>
         </Router>
     );
 };

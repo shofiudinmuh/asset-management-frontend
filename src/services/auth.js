@@ -1,20 +1,30 @@
-export const authService = {
-    login: async (credentials) => {
-        const response = await api.post('/login', credentials);
-        return response.data;
-    },
+import api from '../utils/axios';
 
+export const authService = {
+    login: async (email, password) => {
+        await api.get('/sanctum/csrf-cookie');
+
+        // return api.post('/api/login', { email, password });
+        const response = await api.post('/api/login', { email, password });
+
+        const token = response.data.token;
+        if (token) {
+            localStorage.setItem('access_token', token);
+        }
+        return response;
+    },
     logout: async () => {
-        await api.post('/logout');
+        await api.post('api/logout');
+        localStorage.removeItem('access_token');
     },
 
     getUser: async () => {
-        const response = await api.get('/api/users');
+        const response = await api.get('api/users');
         return response.data;
     },
 
     register: async (userData) => {
-        const response = await api.post('/register', userData);
-        return response.data;
+        const response = await api.post('api/register', userData);
+        return response;
     },
 };

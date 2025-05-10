@@ -3,181 +3,30 @@ import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 
-const supplierData = [
-    {
-        id: 1,
-        name: 'Alexander Arnold',
-        contact_person: 'Roberto Manchini',
-        phone: '09871243627',
-        email: 'trent-arnold@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:37:40.000000Z',
-        updated_at: '2025-03-29T14:37:40.000000Z',
-    },
-    {
-        id: 2,
-        name: 'Alexander Isak',
-        contact_person: 'Roberto Aguero',
-        phone: '09871243627',
-        email: 'alexisak@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:43:23.000000Z',
-        updated_at: '2025-03-29T14:43:23.000000Z',
-    },
-    {
-        id: 3,
-        name: 'Alexander Arnold',
-        contact_person: 'Roberto Manchini',
-        phone: '09871243627',
-        email: 'trent-arnold@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:37:40.000000Z',
-        updated_at: '2025-03-29T14:37:40.000000Z',
-    },
-    {
-        id: 4,
-        name: 'Alexander Isak',
-        contact_person: 'Roberto Aguero',
-        phone: '09871243627',
-        email: 'alexisak@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:43:23.000000Z',
-        updated_at: '2025-03-29T14:43:23.000000Z',
-    },
-    {
-        id: 5,
-        name: 'Alexander Arnold',
-        contact_person: 'Roberto Manchini',
-        phone: '09871243627',
-        email: 'trent-arnold@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:37:40.000000Z',
-        updated_at: '2025-03-29T14:37:40.000000Z',
-    },
-    {
-        id: 6,
-        name: 'Alexander Isak',
-        contact_person: 'Roberto Aguero',
-        phone: '09871243627',
-        email: 'alexisak@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:43:23.000000Z',
-        updated_at: '2025-03-29T14:43:23.000000Z',
-    },
-    {
-        id: 7,
-        name: 'Alexander Arnold',
-        contact_person: 'Roberto Manchini',
-        phone: '09871243627',
-        email: 'trent-arnold@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:37:40.000000Z',
-        updated_at: '2025-03-29T14:37:40.000000Z',
-    },
-    {
-        id: 8,
-        name: 'Alexander Isak',
-        contact_person: 'Roberto Aguero',
-        phone: '09871243627',
-        email: 'alexisak@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:43:23.000000Z',
-        updated_at: '2025-03-29T14:43:23.000000Z',
-    },
-    {
-        id: 9,
-        name: 'Alexander Arnold',
-        contact_person: 'Roberto Manchini',
-        phone: '09871243627',
-        email: 'trent-arnold@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:37:40.000000Z',
-        updated_at: '2025-03-29T14:37:40.000000Z',
-    },
-    {
-        id: 10,
-        name: 'Alexander Isak',
-        contact_person: 'Roberto Aguero',
-        phone: '09871243627',
-        email: 'alexisak@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:43:23.000000Z',
-        updated_at: '2025-03-29T14:43:23.000000Z',
-    },
-    {
-        id: 11,
-        name: 'Alexander Arnold',
-        contact_person: 'Roberto Manchini',
-        phone: '09871243627',
-        email: 'trent-arnold@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:37:40.000000Z',
-        updated_at: '2025-03-29T14:37:40.000000Z',
-    },
-    {
-        id: 12,
-        name: 'Alexander Isak',
-        contact_person: 'Roberto Aguero',
-        phone: '09871243627',
-        email: 'alexisak@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:43:23.000000Z',
-        updated_at: '2025-03-29T14:43:23.000000Z',
-    },
-    {
-        id: 13,
-        name: 'Alexander Arnold',
-        contact_person: 'Roberto Manchini',
-        phone: '09871243627',
-        email: 'trent-arnold@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:37:40.000000Z',
-        updated_at: '2025-03-29T14:37:40.000000Z',
-    },
-    {
-        id: 14,
-        name: 'Alexander Isak',
-        contact_person: 'Roberto Aguero',
-        phone: '09871243627',
-        email: 'alexisak@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:43:23.000000Z',
-        updated_at: '2025-03-29T14:43:23.000000Z',
-    },
-    {
-        id: 15,
-        name: 'Alexander Arnold',
-        contact_person: 'Roberto Manchini',
-        phone: '09871243627',
-        email: 'trent-arnold@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:37:40.000000Z',
-        updated_at: '2025-03-29T14:37:40.000000Z',
-    },
-    {
-        id: 16,
-        name: 'Alexander Isak',
-        contact_person: 'Roberto Aguero',
-        phone: '09871243627',
-        email: 'alexisak@am.test',
-        address: 'Surabaya Timur',
-        created_at: '2025-03-29T14:43:23.000000Z',
-        updated_at: '2025-03-29T14:43:23.000000Z',
-    },
-];
-
-export default function supplierTable({ onEditSupplier, data }) {
+export default function supplierTable({ onEditSupplier, onDeleteSupplier, data }) {
     const tableRef = useRef(null);
 
     useEffect(() => {
+        if (!tableRef.current || !data || data.length === 0) return;
+
         if ($.fn.DataTable.isDataTable(tableRef.current)) {
             $(tableRef.current).DataTable().destroy();
         }
 
-        const $table = $(tableRef.current).DataTable({
-            data: supplierData,
+        $(tableRef.current).DataTable({
+            data: data,
             columns: [
-                { title: 'No', data: 'id', className: 'text-start', width: '5%' },
+                {
+                    title: 'No',
+                    data: null,
+                    className: 'text-start',
+                    width: '5%',
+                    render: (data, type, row, meta) => {
+                        return `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${
+                            meta.row + 1
+                        }</div>`;
+                    },
+                },
                 {
                     title: 'Name',
                     data: 'name',
@@ -285,21 +134,21 @@ export default function supplierTable({ onEditSupplier, data }) {
         $(tableRef.current).on('click', '.action-delete', function () {
             const supplierId = $(this).data('id');
             console.log('Delete supplier : ', supplierId);
+            onDeleteSupplier(supplierId);
         });
         $(tableRef.current).on('click', '.action-edit', function () {
             const supplierId = $(this).data('id');
-            const selectedSupplier = supplierData.find((supplier) => supplier.id === supplierId);
-            if (selectedSupplier) {
-                onEditSupplier(selectedSupplier);
-            }
+            const selectedSupplier = data.find((supplier) => supplier.id === supplierId);
+            if (selectedSupplier) onEditSupplier(selectedSupplier);
         });
 
         return () => {
+            $(tableRef.current).off('click');
             if ($.fn.DataTable.isDataTable(tableRef.current)) {
-                $table.destroy();
+                $(tableRef.current).DataTable().destroy();
             }
         };
-    }, []);
+    }, [data]);
 
     return (
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white/[0.05] dark:bg-gray-800'>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useModal } from '../../hooks/useModal';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadCrumb from '../../components/common/PageBreadCrumb';
@@ -7,53 +7,66 @@ import SupplierTable from '../../components/tables/SupplierTable';
 import Modal from '../../components/ui/Modal';
 import Label from '../../components/form/Label';
 import InputField from '../../components/form/input/InputField';
+import {
+    createSupplier,
+    deleteSupplier,
+    getSuppliers,
+    updateSupplier,
+} from '../../api/supplierApi';
 
 export default function SupplierPage() {
     const [suppliers, setSuppliers] = useState([]);
     const [supplierName, setSupplierName] = useState('');
     const [supplierContact, setSupplierContact] = useState('');
     const [supplierEmail, setSupplierEmail] = useState('');
+    const [supplierPhone, setSupplierPhone] = useState('');
     const [supplierAddress, setSupplierAddress] = useState('');
     const [selectedSupplier, setSelectedSupplier] = useState(null);
     const { isOpen, openModal, closeModal } = useModal();
 
+    useEffect(() => {
+        fetchSuppliers();
+    }, []);
+
+    const fetchSuppliers = async () => {
+        try {
+            const supplier = await getSuppliers();
+            setSuppliers(supplier.data.data.data);
+        } catch (error) {
+            console.log('Failed to fetch suppliers', error);
+        }
+    };
     const resetForm = () => {
         setSupplierName('');
         setSupplierContact('');
         setSupplierEmail('');
         setSupplierAddress('');
+        setSupplierPhone('');
         setSelectedSupplier('');
     };
 
-    const handleAddOrUpdateSupplier = () => {
-        if (selectedSupplier) {
-            // edit supplier
-            setSuppliers((prevSuppliers) => {
-                prevSuppliers.map((supplier) =>
-                    supplier.id === selectedSupplier.id
-                        ? {
-                              ...supplier,
-                              name: supplierName,
-                              contact_person: supplierContact,
-                              email: supplierEmail,
-                              address: supplierAddress,
-                          }
-                        : supplier
-                );
-            });
-        } else {
-            // add new supplier
-            const newSupplier = {
-                name: supplierName,
-                contact_person: supplierContact,
-                email: supplierEmail,
-                address: supplierAddress,
-            };
+    const handleAddOrUpdateSupplier = async () => {
+        const supplierData = {
+            name: supplierName,
+            contact_person: supplierContact,
+            email: supplierEmail,
+            address: supplierAddress,
+            phone: supplierPhone,
+        };
 
-            setSuppliers([...suppliers, { ...newSupplier }]);
+        try {
+            if (selectedSupplier) {
+                await updateSupplier(selectedSupplier.id, supplierData);
+            } else {
+                await createSupplier(supplierData);
+            }
+
+            await fetchSuppliers();
+            closeModal();
+            resetForm();
+        } catch (error) {
+            console.log('Failed to create supplier', error);
         }
-        closeModal();
-        resetForm();
     };
 
     const handleEditSupplier = (supplier) => {
@@ -61,8 +74,21 @@ export default function SupplierPage() {
         setSupplierName(supplier.name);
         setSupplierContact(supplier.contact_person);
         setSupplierEmail(supplier.email);
+        setSupplierPhone(supplier.phone);
+
         setSupplierAddress(supplier.address);
         openModal();
+    };
+
+    const handleDeleteSupplier = async (id) => {
+        if (confirm('Are you sure want to delete this supplier?')) {
+            try {
+                await deleteSupplier(id);
+                await fetchSuppliers();
+            } catch (error) {
+                console.error('Failed to delete supplier', error);
+            }
+        }
     };
 
     return (
@@ -84,7 +110,11 @@ export default function SupplierPage() {
                         }}>
                         Add New Supplier
                     </button>
-                    <SupplierTable onEditSupplier={handleEditSupplier} />
+                    <SupplierTable
+                        data={suppliers}
+                        onDeleteSupplier={handleDeleteSupplier}
+                        onEditSupplier={handleEditSupplier}
+                    />
                 </ComponentCard>
             </div>
 
@@ -101,7 +131,11 @@ export default function SupplierPage() {
                         {selectedSupplier ? 'Edit Supplier' : 'Add New Supplier'}
                     </h3>
                 </div>
-                <form action=''>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleAddOrUpdateSupplier();
+                    }}>
                     <div>
                         <Label>
                             Name <span className='text-error-500'>*</span>
@@ -126,6 +160,19 @@ export default function SupplierPage() {
                             value={supplierContact}
                             placeholder='Enter supplier contact person'
                             onChange={(e) => setSupplierContact(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <Label>
+                            Phone<span className='text-error-500'>*</span>
+                        </Label>
+                        <InputField
+                            type='text'
+                            id='phone'
+                            name='phone'
+                            value={supplierPhone}
+                            placeholder='Enter supplier phone contact'
+                            onChange={(e) => setSupplierPhone(e.target.value)}
                         />
                     </div>
                     <div>
@@ -164,7 +211,9 @@ export default function SupplierPage() {
                             className='px-4 py-2 border rounded text-gray-700'>
                             Cancel
                         </button>
-                        <button className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-600'>
+                        <button
+                            type='submit'
+                            className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-600'>
                             {selectedSupplier ? 'Update' : 'Add'}
                         </button>
                     </div>

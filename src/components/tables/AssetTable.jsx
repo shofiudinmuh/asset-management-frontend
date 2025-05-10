@@ -3,55 +3,23 @@ import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 
-const assetData = [
-    {
-        id: 1,
-        name: 'Server',
-        category: 'Peralatan',
-        serial_number: 'JKDNFAOI12335JNAKJDN',
-        purchase_date: '2025-03-30T00:00:00.000000Z',
-        warranty_expiry: null,
-        status: 'Tersedia',
-        location: {
-            id: 3,
-            name: 'Surabaya 3',
-            address: 'Jalan Ir Soekarno No 19',
-            created_at: '2025-03-30T05:00:26.000000Z',
-            update_at: '2025-03-30T05:00:26.000000Z',
-        },
-        created_at: '2025-03-30T14:27:32.000000Z',
-        updated_at: '2025-03-30T14:27:32.000000Z',
-    },
-    {
-        id: 2,
-        name: 'Server',
-        category: 'Peralatan',
-        serial_number: 'JKDNFAOI12335JNAKJDN12',
-        purchase_date: '2025-03-30T00:00:00.000000Z',
-        warranty_expiry: '2027-03-30T00:00:00.000000Z',
-        status: 'Tersedia',
-        location: {
-            id: 3,
-            name: 'Surabaya 3',
-            address: 'Jalan Ir Soekarno No 19',
-            created_at: '2025-03-30T05:00:26.000000Z',
-            update_at: '2025-03-30T05:00:26.000000Z',
-        },
-        created_at: '2025-04-06T06:41:17.000000Z',
-        updated_at: '2025-04-06T06:41:17.000000Z',
-    },
-];
-
-export default function AssetTable({ onEditAsset, data }) {
+export default function AssetTable({ onEditAsset, onDeleteAsset, data }) {
     const tableRef = useRef(null);
+    const dataTable = useRef(null);
 
     useEffect(() => {
+        // if (!data || data.length === 0) return;
+        if (!tableRef.current || !data || data.length === 0) return;
+
+        // if ($.fn.DataTable.isDataTable(tableRef.current)) {
+        //     $(tableRef.current).DataTable().clear().rows.add(data).draw();
+        // }
         if ($.fn.DataTable.isDataTable(tableRef.current)) {
             $(tableRef.current).DataTable().destroy();
         }
 
-        const $table = $(tableRef.current).DataTable({
-            data: assetData,
+        $(tableRef.current).DataTable({
+            data: data,
             columns: [
                 { title: 'No', data: 'id', className: 'text-start', width: '5%' },
                 {
@@ -112,7 +80,9 @@ export default function AssetTable({ onEditAsset, data }) {
                     data: 'location',
                     width: '15%',
                     render: (location) =>
-                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${location.name}</div>`,
+                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${
+                            location.name || ''
+                        }</div>`,
                 },
                 {
                     title: 'Status',
@@ -128,14 +98,15 @@ export default function AssetTable({ onEditAsset, data }) {
                     render: (data, type, row) =>
                         `<div class='flex space-x-2'>
                             <button data-id='${row.id}' class='action-edit text-sm font-medium px-3 py-1 bg-brand-500 hover:bg-brand-700 text-white rounded'>Edit</button>
-                            <button data-id='${row.id}' class='action-delete text-sm font-medium px-3 py-1 bg-error-500 hover:bg-error-700 text-white rounded'>Edit</button>
+                            <button data-id='${row.id}' class='action-delete text-sm font-medium px-3 py-1 bg-error-500 hover:bg-error-700 text-white rounded'>Delete</button>
                             </div>    
                         `,
                 },
             ],
+            destroy: true,
             responsive: true,
             paging: true,
-            pageLenght: 10,
+            pageLength: 10,
             lenghtMenu: [5, 10, 25, 50],
             searching: true,
             ordering: true,
@@ -201,15 +172,29 @@ export default function AssetTable({ onEditAsset, data }) {
         $(tableRef.current).on('click', '.action-delete', function () {
             const assetId = $(this).data('id');
             console.log('Delete asset : ', assetId);
+            onDeleteAsset(assetId);
         });
+        // $(tableRef.current).on('click', '.action-edit', function () {
+        //     const assetId = $(this).data('id');
+        //     const selectedAsset = assetData.find((asset) => asset.id === assetId);
+        //     if (selectedAsset) {
+        //         onEditAsset(selectedAsset);
+        //     }
+        // });
+
         $(tableRef.current).on('click', '.action-edit', function () {
             const assetId = $(this).data('id');
-            const selectedAsset = assetData.find((asset) => asset.id === assetId);
-            if (selectedAsset) {
-                onEditAsset(selectedAsset);
-            }
+            const selectedAsset = data.find((asset) => asset.id === assetId);
+            if (selectedAsset) onEditAsset(selectedAsset);
         });
-    }, []);
+
+        return () => {
+            $(tableRef.current).off('click');
+            if ($.fn.DataTable.isDataTable(tableRef.current)) {
+                $(tableRef.current).DataTable().destroy();
+            }
+        };
+    }, [data]);
 
     return (
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white/[0.05] dark:bg-gray-800'>

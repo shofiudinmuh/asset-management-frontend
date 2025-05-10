@@ -42,17 +42,4 @@ const Select = ({
     );
 };
 
-Select.propTypes = {
-    options: PropTypes.arrayOf(
-        PropTypes.shape({
-            value: PropTypes.string.isRequired,
-            label: PropTypes.string.isRequired,
-        })
-    ).isRequired,
-    placeholder: PropTypes.string,
-    onChange: PropTypes.func.isRequired,
-    className: PropTypes.string,
-    defaultValue: PropTypes.string,
-};
-
 export default Select;

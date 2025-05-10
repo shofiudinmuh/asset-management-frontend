@@ -21,7 +21,17 @@ export default function AssetTable({ onEditAsset, onDeleteAsset, data }) {
         $(tableRef.current).DataTable({
             data: data,
             columns: [
-                { title: 'No', data: 'id', className: 'text-start', width: '5%' },
+                {
+                    title: 'No',
+                    data: null,
+                    className: 'text-start',
+                    width: '5%',
+                    render: (data, type, row, meta) => {
+                        return `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${
+                            meta.row + 1
+                        }</div>`;
+                    },
+                },
                 {
                     title: 'Name',
                     data: 'name',

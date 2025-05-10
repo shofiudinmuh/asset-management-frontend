@@ -3,154 +3,30 @@ import $ from 'jquery';
 import 'datatables.net';
 // import 'datatables.net-dt/css/dataTables.dataTables.css';
 
-const locationData = [
-    {
-        id: 1,
-        name: 'Surabaya Selatan',
-        address: 'Jalan Achmad Yani',
-        created_at: '2025-03-30T05:00:08.000000Z',
-        update_at: '2025-03-30T13:37:39.000000Z',
-    },
-    {
-        id: 2,
-        name: 'Surabaya 3',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:00:26.000000Z',
-        update_at: '2025-03-30T05:00:26.000000Z',
-    },
-    {
-        id: 3,
-        name: 'Surabaya 4',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:02:08.000000Z',
-        update_at: '2025-03-30T05:02:08.000000Z',
-    },
-    {
-        id: 4,
-        name: 'Surabaya Selatan',
-        address: 'Jalan Achmad Yani',
-        created_at: '2025-03-30T05:00:08.000000Z',
-        update_at: '2025-03-30T13:37:39.000000Z',
-    },
-    {
-        id: 5,
-        name: 'Surabaya 3',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:00:26.000000Z',
-        update_at: '2025-03-30T05:00:26.000000Z',
-    },
-    {
-        id: 6,
-        name: 'Surabaya 4',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:02:08.000000Z',
-        update_at: '2025-03-30T05:02:08.000000Z',
-    },
-    {
-        id: 7,
-        name: 'Surabaya Selatan',
-        address: 'Jalan Achmad Yani',
-        created_at: '2025-03-30T05:00:08.000000Z',
-        update_at: '2025-03-30T13:37:39.000000Z',
-    },
-    {
-        id: 8,
-        name: 'Surabaya 3',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:00:26.000000Z',
-        update_at: '2025-03-30T05:00:26.000000Z',
-    },
-    {
-        id: 9,
-        name: 'Surabaya 4',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:02:08.000000Z',
-        update_at: '2025-03-30T05:02:08.000000Z',
-    },
-    {
-        id: 10,
-        name: 'Surabaya 4',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:02:08.000000Z',
-        update_at: '2025-03-30T05:02:08.000000Z',
-    },
-    {
-        id: 11,
-        name: 'Surabaya Selatan',
-        address: 'Jalan Achmad Yani',
-        created_at: '2025-03-30T05:00:08.000000Z',
-        update_at: '2025-03-30T13:37:39.000000Z',
-    },
-    {
-        id: 12,
-        name: 'Surabaya 3',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:00:26.000000Z',
-        update_at: '2025-03-30T05:00:26.000000Z',
-    },
-    {
-        id: 13,
-        name: 'Surabaya 4',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:02:08.000000Z',
-        update_at: '2025-03-30T05:02:08.000000Z',
-    },
-    {
-        id: 14,
-        name: 'Surabaya Selatan',
-        address: 'Jalan Achmad Yani',
-        created_at: '2025-03-30T05:00:08.000000Z',
-        update_at: '2025-03-30T13:37:39.000000Z',
-    },
-    {
-        id: 15,
-        name: 'Surabaya 3',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:00:26.000000Z',
-        update_at: '2025-03-30T05:00:26.000000Z',
-    },
-    {
-        id: 16,
-        name: 'Surabaya 4',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:02:08.000000Z',
-        update_at: '2025-03-30T05:02:08.000000Z',
-    },
-    {
-        id: 17,
-        name: 'Surabaya Selatan',
-        address: 'Jalan Achmad Yani',
-        created_at: '2025-03-30T05:00:08.000000Z',
-        update_at: '2025-03-30T13:37:39.000000Z',
-    },
-    {
-        id: 18,
-        name: 'Surabaya 3',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:00:26.000000Z',
-        update_at: '2025-03-30T05:00:26.000000Z',
-    },
-    {
-        id: 19,
-        name: 'Surabaya 4',
-        address: 'Jalan Ir Soekarno No 19',
-        created_at: '2025-03-30T05:02:08.000000Z',
-        update_at: '2025-03-30T05:02:08.000000Z',
-    },
-];
-
-export default function LocationTable({ onEditLocation, data }) {
+export default function LocationTable({ onEditLocation, onDeleteLocation, data }) {
     const tableRef = useRef(null);
 
     useEffect(() => {
+        if (!tableRef.current || !data || data.length === 0) return;
+
         if ($.fn.DataTable.isDataTable(tableRef.current)) {
             $(tableRef.current).DataTable().destroy();
         }
 
-        const $table = $(tableRef.current).DataTable({
-            data: locationData,
+        $(tableRef.current).DataTable({
+            data: data,
             columns: [
-                { title: 'No', data: 'id', className: 'text-start', width: '5%' },
+                {
+                    title: 'No',
+                    data: null,
+                    className: 'text-start',
+                    width: '5%',
+                    render: (data, type, row, meta) => {
+                        return `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${
+                            meta.row + 1
+                        }</div>`;
+                    },
+                },
                 {
                     title: 'Name',
                     data: 'name',
@@ -240,21 +116,21 @@ export default function LocationTable({ onEditLocation, data }) {
         $(tableRef.current).on('click', '.action-delete', function () {
             const locationId = $(this).data('id');
             console.log('Delete location : ', locationId);
+            onDeleteLocation(locationId);
         });
         $(tableRef.current).on('click', '.action-edit', function () {
             const locationId = $(this).data('id');
-            const selectedLocation = locationData.find((location) => location.id === locationId);
-            if (selectedLocation) {
-                onEditLocation(selectedLocation);
-            }
+            const selectedLocation = data.find((location) => location.id === locationId);
+            if (selectedLocation) onEditLocation(selectedLocation);
         });
 
         return () => {
+            $(tableRef.current).off('click');
             if ($.fn.DataTable.isDataTable(tableRef.current)) {
-                $table.destroy();
+                $(tableRef.current).DataTable().destroy();
             }
         };
-    }, []);
+    }, [data]);
 
     return (
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white/[0.05] dark:bg-gray-800'>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useModal } from '../../hooks/useModal';
 import AssetTable from '../../components/tables/AssetTable';
 import PageMeta from '../../components/common/PageMeta';
@@ -7,6 +7,9 @@ import ComponentCard from '../../components/common/ComponentCard';
 import Modal from '../../components/ui/Modal';
 import Label from '../../components/form/Label';
 import InputField from '../../components/form/input/InputField';
+import { getAssets, createAsset, updateAsset, deleteAsset } from '../../api/assetApi';
+import Select from '../../components/form/Select';
+import { getLocations } from '../../api/locationApi';
 
 export default function AssetPage() {
     const [assets, setAssets] = useState([]);
@@ -15,10 +18,38 @@ export default function AssetPage() {
     const [assetSerialNumber, setAssetSerialNumber] = useState('');
     const [assetPurchaseDate, setAssetPurchaseDate] = useState('');
     const [assetExpiry, setAssetExpiry] = useState('');
+    const [location, setLocation] = useState([]);
     const [assetLocation, setAssetLocation] = useState('');
     const [assetStatus, setAssetStatus] = useState('');
     const [selectedAsset, setSelectedAsset] = useState(null);
     const { isOpen, openModal, closeModal } = useModal();
+
+    useEffect(() => {
+        fetchAssets();
+        fetchLocation();
+    }, []);
+
+    const fetchAssets = async () => {
+        try {
+            const res = await getAssets();
+            setAssets(res.data.data.data);
+        } catch (error) {
+            console.log('Failed to fetch assets ', error);
+        }
+    };
+
+    const fetchLocation = async () => {
+        try {
+            const loc = await getLocations();
+            const formattedLocation = loc.data.data.data.map((locations) => ({
+                value: locations.id,
+                label: locations.name,
+            }));
+            setLocation(formattedLocation);
+        } catch (error) {
+            console.log('Failed to fetch location', error);
+        }
+    };
 
     const resetForm = () => {
         setAssetName('');
@@ -31,44 +62,31 @@ export default function AssetPage() {
         setSelectedAsset('');
     };
 
-    const handleAddOrUpdateAsset = () => {
-        if (selectedAsset) {
-            // edit
-            setAssets((prevAssets) => {
-                prevAssets.map((asset) =>
-                    asset.id === selectedAsset.id
-                        ? {
-                              ...asset,
-                              name: assetName,
-                              category: assetCategory,
-                              serial_number: assetSerialNumber,
-                              purchase_date: assetPurchaseDate,
-                              warranty_expiry: assetExpiry,
-                              location: assetLocation,
-                              status: assetStatus,
-                          }
-                        : asset
-                );
-            });
-        } else {
-            // add new asset
-            const newAsset = {
-                name: assetName,
-                category: assetCategory,
-                serial_number: assetSerialNumber,
-                purchase_date: assetPurchaseDate,
-                warranty_expiry: assetExpiry,
-                location: assetLocation,
-                status: assetStatus,
-            };
+    const handleAddOrUpdateAsset = async () => {
+        const assetData = {
+            name: assetName,
+            category: assetCategory,
+            serial_number: assetSerialNumber,
+            purchase_date: assetPurchaseDate,
+            warranty_expiry: assetExpiry,
+            location_id: assetLocation?.value ?? assetLocation,
+            status: assetStatus,
+        };
 
-            setAssets([...assets, { ...newAsset }]);
+        try {
+            if (selectedAsset) {
+                await updateAsset(selectedAsset.id, assetData);
+            } else {
+                await createAsset(assetData);
+            }
+
+            await fetchAssets();
+            closeModal();
+            resetForm();
+        } catch (error) {
+            console.log('Failed to create asset', error);
         }
-
-        closeModal();
-        resetForm();
     };
-
     const handleEditAsset = (asset) => {
         setSelectedAsset(asset);
         setAssetName(asset.name);
@@ -76,9 +94,20 @@ export default function AssetPage() {
         setAssetSerialNumber(asset.serial_number);
         setAssetPurchaseDate(asset.purchase_date);
         setAssetExpiry(asset.warranty_expiry);
-        setAssetLocation(asset.location);
+        setAssetLocation({ value: asset.location.id });
         setAssetStatus(asset.status);
         openModal();
+    };
+
+    const handleDeleteAsset = async (id) => {
+        if (confirm('Are you sure want to delete this asset?')) {
+            try {
+                await deleteAsset(id);
+                await fetchAssets();
+            } catch (error) {
+                console.error('Failed to delete asset', error);
+            }
+        }
     };
 
     return (
@@ -98,7 +127,11 @@ export default function AssetPage() {
                         Add New Asset
                     </button>
 
-                    <AssetTable onEditAsset={handleEditAsset} />
+                    <AssetTable
+                        data={assets}
+                        onDeleteAsset={handleDeleteAsset}
+                        onEditAsset={handleEditAsset}
+                    />
                 </ComponentCard>
             </div>
 
@@ -112,10 +145,14 @@ export default function AssetPage() {
                 className='max-w-xl p-6'>
                 <div className='flex flex-col gap-4'>
                     <h3 className='text-lg font-semibold text-gray-800 dark:text-white'>
-                        {selectedAsset ? 'Edit Asset' : 'Add New Asser'}
+                        {selectedAsset ? 'Edit Asset' : 'Add New Asset'}
                     </h3>
                 </div>
-                <form action=''>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault(); // Hindari reload halaman
+                        handleAddOrUpdateAsset();
+                    }}>
                     <div>
                         <Label>
                             Name <span className='text-error-500'>*</span>
@@ -126,20 +163,23 @@ export default function AssetPage() {
                             name='name'
                             value={assetName}
                             placeholder='Enter asset name'
-                            onChange={(e) => assetName(e.target.value)}
+                            onChange={(e) => setAssetName(e.target.value)}
                         />
                     </div>
                     <div>
                         <Label>
                             Category <span className='text-error-500'>*</span>
                         </Label>
-                        <InputField
-                            type='text'
-                            id='category'
-                            name='category'
-                            value={assetCategory}
-                            placeholder='Enter category name'
-                            onChange={(e) => assetCategory(e.target.value)}
+                        <Select
+                            options={[
+                                { value: 'Mesin', label: 'Mesin' },
+                                { value: 'Peralatan', label: 'Peralatan' },
+                                { value: 'Kendaraan', label: 'Kendaraan' },
+                                { value: 'Bahan Baku', label: 'Bahan Baku' },
+                            ]}
+                            placeholder='Select category'
+                            defaultValue={assetCategory}
+                            onChange={(value) => setAssetCategory(value)}
                         />
                     </div>
                     <div>
@@ -152,7 +192,19 @@ export default function AssetPage() {
                             name='serial_number'
                             value={assetSerialNumber}
                             placeholder='Enter serial number'
-                            onChange={(e) => assetSerialNumber(e.target.value)}
+                            onChange={(e) => setAssetSerialNumber(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <Label>
+                            Location <span className='text-error-500'>*</span>
+                        </Label>
+                        <Select
+                            key={location.id}
+                            options={location}
+                            defaultValue={assetLocation}
+                            onChange={(value) => setAssetLocation(value)}
+                            placeholder='Select location'
                         />
                     </div>
                     <div>
@@ -165,7 +217,7 @@ export default function AssetPage() {
                             name='purchase_date'
                             value={assetPurchaseDate}
                             placeholder='Enter purchase date'
-                            onChange={(e) => assetPurchaseDate(e.target.value)}
+                            onChange={(e) => setAssetPurchaseDate(e.target.value)}
                         />
                     </div>
                     <div>
@@ -178,20 +230,23 @@ export default function AssetPage() {
                             name='warranty_expiry'
                             value={assetExpiry}
                             placeholder='Enter expiry date'
-                            onChange={(e) => assetExpiry(e.target.value)}
+                            onChange={(e) => setAssetExpiry(e.target.value)}
                         />
                     </div>
                     <div>
                         <Label>
                             Status <span className='text-error-500'>*</span>
                         </Label>
-                        <InputField
-                            type='text'
-                            id='status'
-                            name='status'
-                            value={assetStatus}
-                            placeholder='Enter asset status'
-                            onChange={(e) => assetStatus(e.target.value)}
+                        <Select
+                            options={[
+                                { value: 'Tersedia', label: 'Tersedia' },
+                                { value: 'Dipinjam', label: 'Dipinjam' },
+                                { value: 'Dalam Perbaikan', label: 'Dalam Perbaikan' },
+                                { value: 'Rusak', label: 'Rusak' },
+                            ]}
+                            placeholder='Select status'
+                            defaultValue={assetStatus}
+                            onChange={(value) => setAssetStatus(value)}
                         />
                     </div>
 
@@ -204,7 +259,9 @@ export default function AssetPage() {
                             className='px-4 py-2 border rounded text-gray-700'>
                             Cancel
                         </button>
-                        <button className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-600'>
+                        <button
+                            type='submit'
+                            className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-600'>
                             {selectedAsset ? 'Update' : 'Add'}
                         </button>
                     </div>

@@ -4,128 +4,29 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 
 import { useEffect, useRef } from 'react';
 
-const userData = [
-    /* ... data seperti sebelumnya ... */
-    {
-        id: 1,
-        name: 'User Test 1',
-        email: 'user-test1@am.test',
-        created_at: '2025-03-29 07:24:17',
-        password: 'password1',
-    },
-    {
-        id: 2,
-        name: 'User Tes 2',
-        email: 'user-test2@am.test',
-        created_at: '2025-03-29 07:32:04',
-        password: 'password2',
-    },
-    {
-        id: 3,
-        name: 'User Test 3',
-        email: 'user-test3@am.test',
-        created_at: '2025-03-29 14:08:22',
-        password: 'password3',
-    },
-    {
-        id: 4,
-        name: 'User Test 4',
-        email: 'user-test4@am.test',
-        created_at: '2025-03-29 14:21:50',
-        password: 'password4',
-    },
-    {
-        id: 5,
-        name: 'Muhammad Shofiudin',
-        email: 'shofiudin@am.test',
-        created_at: '2025-03-30 11:34:05',
-        password: 'password5',
-    },
-    {
-        id: 6,
-        name: 'User Test 1',
-        email: 'user-test1@am.test',
-        created_at: '2025-03-29 07:24:17',
-        password: 'password6',
-    },
-    {
-        id: 7,
-        name: 'User Tes 2',
-        email: 'user-test2@am.test',
-        created_at: '2025-03-29 07:32:04',
-        password: 'password7',
-    },
-    {
-        id: 8,
-        name: 'User Test 3',
-        email: 'user-test3@am.test',
-        created_at: '2025-03-29 14:08:22',
-        password: 'password8',
-    },
-    {
-        id: 9,
-        name: 'User Test 4',
-        email: 'user-test4@am.test',
-        created_at: '2025-03-29 14:21:50',
-        password: 'password9',
-    },
-    {
-        id: 10,
-        name: 'Muhammad Shofiudin',
-        email: 'shofiudin@am.test',
-        created_at: '2025-03-30 11:34:05',
-        password: 'password10',
-    },
-    {
-        id: 11,
-        name: 'User Test 1',
-        email: 'user-test1@am.test',
-        created_at: '2025-03-29 07:24:17',
-        password: 'password11',
-    },
-    {
-        id: 12,
-        name: 'User Tes 2',
-        email: 'user-test2@am.test',
-        created_at: '2025-03-29 07:32:04',
-        password: 'password12',
-    },
-    {
-        id: 13,
-        name: 'User Test 3',
-        email: 'user-test3@am.test',
-        created_at: '2025-03-29 14:08:22',
-        password: 'password13',
-    },
-    {
-        id: 14,
-        name: 'User Test 4',
-        email: 'user-test4@am.test',
-        created_at: '2025-03-29 14:21:50',
-        password: 'password14',
-    },
-    {
-        id: 15,
-        name: 'Muhammad Shofiudin',
-        email: 'shofiudin@am.test',
-        created_at: '2025-03-30 11:34:05',
-        password: 'password15',
-    },
-];
-
-export default function UserTable({ onEditUser, data }) {
+export default function UserTable({ onEditUser, onDeleteUser, data }) {
     const tableRef = useRef(null);
-    // const selectedUser = data.find((user) => user.id === userId);
 
     useEffect(() => {
+        if (!tableRef.current || !data || data.length === 0) return;
         if ($.fn.DataTable.isDataTable(tableRef.current)) {
             $(tableRef.current).DataTable().destroy();
         }
 
-        const $table = $(tableRef.current).DataTable({
-            data: userData,
+        $(tableRef.current).DataTable({
+            data: data,
             columns: [
-                { title: 'ID', data: 'id', className: 'text-start', width: '5%' },
+                {
+                    title: 'No',
+                    data: null,
+                    className: 'text-start',
+                    width: '5%',
+                    render: (data, type, row, meta) => {
+                        return `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${
+                            meta.row + 1
+                        }</div>`;
+                    },
+                },
                 {
                     title: 'Name',
                     data: 'name',
@@ -179,7 +80,7 @@ export default function UserTable({ onEditUser, data }) {
             responsive: true,
             paging: true,
             pageLength: 10,
-            lengthMenu: [5, 10, 25, 50],
+            lengthMenu: [5, 10, 25, 50, 100],
             searching: true,
             ordering: true,
             info: true,
@@ -247,21 +148,21 @@ export default function UserTable({ onEditUser, data }) {
         $(tableRef.current).on('click', '.action-delete', function () {
             const userId = $(this).data('id');
             console.log('Delete user : ', userId);
+            onDeleteUser(userId);
         });
         $(tableRef.current).on('click', '.action-edit', function () {
             const userId = $(this).data('id');
-            const selectedUser = userData.find((user) => user.id === userId);
-            if (selectedUser) {
-                onEditUser(selectedUser);
-            }
+            const selectedUser = data.find((user) => user.id === userId);
+            if (selectedUser) onEditUser(selectedUser);
         });
 
         return () => {
+            $(tableRef.current).off('click');
             if ($.fn.DataTable.isDataTable(tableRef.current)) {
-                $table.destroy();
+                $(tableRef.current).DataTable().destroy();
             }
         };
-    }, []);
+    }, [data]);
 
     return (
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-gray-800'>

@@ -3,84 +3,49 @@ import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 
-const maintenanceData = [
-    {
-        id: 1,
-        asset: {
-            id: 2,
-            name: 'Server',
-            category: 'Peralatan',
-            serial_number: 'JKDNFAOI12335JNAKJDN12',
-            purchase_date: '2025-03-30T00:00:00.000000Z',
-            warranty_expiry: '2027-03-30T00:00:00.000000Z',
-            status: 'Tersedia',
-            created_at: '2025-04-06T06:41:17.000000Z',
-            updated_at: '2025-04-06T06:41:17.000000Z',
-        },
-        maintenance_date: '2024-05-06T00:00:00.000000Z',
-        description: 'Maintenance rutin',
-        cost: '450000.00',
-        technician: {
-            id: 3,
-            name: 'User Test 3',
-            email: 'user-test3@am.test',
-            created_at: '2025-03-29 14:08:22',
-        },
-        created_at: '2025-04-06T07:15:38.000000Z',
-        updated_at: '2025-04-06T07:15:38.000000Z',
-    },
-    {
-        id: 2,
-        asset: {
-            id: 2,
-            name: 'Server',
-            category: 'Peralatan',
-            serial_number: 'JKDNFAOI12335JNAKJDN12',
-            purchase_date: '2025-03-30T00:00:00.000000Z',
-            warranty_expiry: '2027-03-30T00:00:00.000000Z',
-            status: 'Tersedia',
-            created_at: '2025-04-06T06:41:17.000000Z',
-            updated_at: '2025-04-06T06:41:17.000000Z',
-        },
-        maintenance_date: '2024-05-08T00:00:00.000000Z',
-        description: 'Penggantian SSD',
-        cost: '650000.00',
-        technician: {
-            id: 3,
-            name: 'User Test 3',
-            email: 'user-test3@am.test',
-            created_at: '2025-03-29 14:08:22',
-        },
-        created_at: '2025-04-06T07:16:33.000000Z',
-        updated_at: '2025-04-06T07:16:33.000000Z',
-    },
-];
-
-export default function MaintenanceTable({ onEditMaintenance, data }) {
+export default function MaintenanceTable({ onEditMaintenance, onDeleteMaintenance, data }) {
     const tableRef = useRef(null);
 
     useEffect(() => {
+        // if (!data || data.length === 0) return;
+        if (!tableRef.current || !data || data.length === 0) return;
+
+        // if ($.fn.DataTable.isDataTable(tableRef.current)) {
+        //     $(tableRef.current).DataTable().clear().rows.add(data).draw();
+        // }
         if ($.fn.DataTable.isDataTable(tableRef.current)) {
             $(tableRef.current).DataTable().destroy();
         }
 
-        const $table = $(tableRef.current).DataTable({
-            data: maintenanceData,
+        $(tableRef.current).DataTable({
+            data: data,
             columns: [
-                { title: 'No', data: 'id', className: 'text-start', width: '5%' },
+                {
+                    title: 'No',
+                    data: null,
+                    className: 'text-start',
+                    width: '5%',
+                    render: (data, type, row, meta) => {
+                        return `<div class='text-sm font-semibold text-gray-700 dark:text-white/90'>${
+                            meta.row + 1
+                        }</div>`;
+                    },
+                },
                 {
                     title: 'Name',
                     data: 'asset',
                     width: '15%',
                     render: (asset) =>
-                        `<div class='text-sm font-semibold text-gray-700 dark:text-white/90'>${asset.name}</div>`,
+                        `<div class='text-sm font-semibold text-gray-700 dark:text-white/90'>${
+                            asset?.name || ''
+                        }</div>`,
                 },
                 {
                     title: 'Category',
                     data: 'asset',
                     width: '10%',
                     render: (asset) =>
-                        `<div class='text-sm font-semibold text-gray-700 dark:text-white/90'>${asset.category}</div>`,
+                        `<div class='text-sm font-semibold text-gray-700 dark:text-white/90'>${asset?.category}</div>`,
                 },
                 {
                     title: 'Date',
@@ -101,7 +66,7 @@ export default function MaintenanceTable({ onEditMaintenance, data }) {
                 {
                     title: 'Description',
                     data: 'description',
-                    width: '20%',
+                    width: '15%',
                     render: (data) =>
                         `<div class='text-sm font-semibold text-gray-700 dark:text-white/90'>${data}</div>`,
                 },
@@ -115,9 +80,9 @@ export default function MaintenanceTable({ onEditMaintenance, data }) {
                 {
                     title: 'PIC',
                     data: 'technician',
-                    width: '10%',
+                    width: '15%',
                     render: (technician) =>
-                        `<div class='text-sm font-semibold text-gray-700 dark:text-white/90'>${technician.name}</div>`,
+                        `<div class='text-sm font-semibold text-gray-700 dark:text-white/90'>${technician?.name}</div>`,
                 },
                 {
                     title: 'Action',
@@ -142,10 +107,10 @@ export default function MaintenanceTable({ onEditMaintenance, data }) {
             dom: `<"flex justify-between items-center mb-4"<"flex-1"f><"flex-none"l>>rt<"flex justify-between items-center mt-4"<"flex-1"i><"flex-none"p>>`,
             language: {
                 search: '_INPUT_',
-                searchPlaceholder: 'Search asset...',
+                searchPlaceholder: 'Search maintenances...',
                 lengthMenu: 'Show _MENU_ assets',
-                info: 'Showing _START_ to _END_ of _TOTAL_ assets',
-                infoEmpty: 'No assets found',
+                info: 'Showing _START_ to _END_ of _TOTAL_ maintenances',
+                infoEmpty: 'No maintenances found',
                 paginate: {
                     first: 'First',
                     last: 'Last',
@@ -202,17 +167,23 @@ export default function MaintenanceTable({ onEditMaintenance, data }) {
         $(tableRef.current).on('click', '.action-delete', function () {
             const maintenanceId = $(this).data('id');
             console.log('Delete maintenance data : ', maintenanceId);
+            onDeleteMaintenance(maintenanceId);
         });
         $(tableRef.current).on('click', '.action-edit', function () {
             const maintenanceId = $(this).data('id');
-            const selectedMaintenance = maintenanceData.find(
+            const selectedMaintenance = data.find(
                 (maintenance) => maintenance.id === maintenanceId
             );
-            if (selectedMaintenance) {
-                onEditMaintenance(selectedMaintenance);
-            }
+            if (selectedMaintenance) onEditMaintenance(selectedMaintenance);
         });
-    }, []);
+
+        return () => {
+            $(tableRef.current).off('click');
+            if ($.fn.DataTable.isDataTable(tableRef.current)) {
+                $(tableRef.current).DataTable().destroy();
+            }
+        };
+    }, [data]);
 
     return (
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white/[0.05] dark:bg-gray-800'>

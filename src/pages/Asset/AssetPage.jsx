@@ -172,10 +172,11 @@ export default function AssetPage() {
                         </Label>
                         <Select
                             options={[
-                                { value: 'Mesin', label: 'Mesin' },
-                                { value: 'Peralatan', label: 'Peralatan' },
+                                { value: 'Peralatan Elektronik', label: 'Peralatan Elektronik' },
+                                { value: 'Furniture', label: 'Furniture' },
+                                { value: 'IT Equipment', label: 'IT Equipment' },
+                                { value: 'Perlengkapan Kantor', label: 'Perlengkapan Kantor' },
                                 { value: 'Kendaraan', label: 'Kendaraan' },
-                                { value: 'Bahan Baku', label: 'Bahan Baku' },
                             ]}
                             placeholder='Select category'
                             defaultValue={assetCategory}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useModal } from '../../hooks/useModal';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadCrumb from '../../components/common/PageBreadCrumb';
@@ -7,21 +7,86 @@ import MaintenanceTable from '../../components/tables/MaintenanceTable';
 import Modal from '../../components/ui/Modal';
 import Label from '../../components/form/Label';
 import InputField from '../../components/form/input/InputField';
+import {
+    createMaintenance,
+    deleteMaintenance,
+    getMaintenances,
+    updateMaintenance,
+} from '../../api/maintenanceApi';
+import { getUsers, getUserSearch } from '../../api/usersApi';
+import { getAssets } from '../../api/assetApi';
+import Select from '../../components/form/Select';
+import AsyncSelect from 'react-select/async';
 
 export default function MaintenancePage() {
     const [maintenances, setMaintenances] = useState([]);
-    const [maintenanceName, setMaintenanceName] = useState('');
-    const [maintenanceCategory, setMaintenanceCategory] = useState('');
+    const [assets, setAssets] = useState([]);
+    const [maintenanceAsset, setMaintenanceAsset] = useState('');
     const [maintenanceDate, setMaintenanceDate] = useState('');
     const [maintenanceDesc, setMaintenanceDesc] = useState('');
     const [maintenanceCost, setMaintenanceCost] = useState('');
+    const [persons, setPersons] = useState([]);
     const [maintenancePerson, setMaintenancePerson] = useState('');
     const [selectedMaintenance, setSelectedMaintenance] = useState(null);
     const { isOpen, openModal, closeModal } = useModal();
 
+    useEffect(() => {
+        fetchMaintenances();
+        fetchAssets();
+        fetchPerson();
+        loadPersons();
+    }, []);
+
+    const fetchMaintenances = async () => {
+        try {
+            const maintenance = await getMaintenances();
+            setMaintenances(maintenance.data.data.data);
+        } catch (error) {
+            console.log('Error fetching maintenances:', error);
+        }
+    };
+
+    const fetchAssets = async () => {
+        try {
+            const asset = await getAssets();
+            const formattedAssets = asset.data.data.data.map((asset) => ({
+                value: asset.id,
+                label: asset.name,
+            }));
+            setAssets(formattedAssets);
+        } catch (error) {
+            console.log('Error fetching assets:', error);
+        }
+    };
+
+    const fetchPerson = async () => {
+        try {
+            const person = await getUsers();
+            const formattedPersons = person.data.data.data.map((person) => ({
+                value: person.id,
+                label: person.name,
+            }));
+            setPersons(formattedPersons);
+        } catch (error) {
+            console.log('Error fetching persons:', error);
+        }
+    };
+
+    const loadPersons = async (inputValue) => {
+        try {
+            const response = await getUserSearch(inputValue);
+            return response.data.data.map((user) => ({
+                value: user.id,
+                label: user.name,
+            }));
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            return [];
+        }
+    };
+
     const resetForm = () => {
-        setMaintenanceName('');
-        setMaintenanceCategory('');
+        setMaintenanceAsset('');
         setMaintenanceDate('');
         setMaintenanceDesc('');
         setMaintenanceCost('');
@@ -29,48 +94,49 @@ export default function MaintenancePage() {
         setSelectedMaintenance('');
     };
 
-    const handleAddOrUpdateMaintenance = () => {
-        if (selectedMaintenance) {
-            // edit
-            setMaintenances((prevMaintenances) => {
-                prevMaintenances.map((maintenance) =>
-                    maintenance.id === selectedMaintenance.id
-                        ? {
-                              ...maintenance,
-                              name: maintenanceName,
-                              maintenance_date: maintenanceDate,
-                              description: maintenanceDesc,
-                              cost: maintenanceCost,
-                              technician: maintenancePerson,
-                          }
-                        : maintenance
-                );
-            });
-        } else {
-            // create new maintenance
-            const newMaintenance = {
-                name: maintenanceName,
-                maintenance_date: maintenanceDate,
-                description: maintenanceDesc,
-                cost: maintenanceCost,
-                technician: maintenancePerson,
-            };
+    const handleAddOrUpdateMaintenance = async () => {
+        const maintenanceData = {
+            asset_id: maintenanceAsset?.value ?? maintenanceAsset,
+            maintenance_date: maintenanceDate,
+            description: maintenanceDesc,
+            cost: maintenanceCost,
+            technician_id: maintenancePerson?.value ?? maintenancePerson,
+        };
 
-            setMaintenances([...maintenances, { ...newMaintenance }]);
+        try {
+            if (selectedMaintenance) {
+                await updateMaintenance(selectedMaintenance.id, maintenanceData);
+            } else {
+                await createMaintenance(maintenanceData);
+            }
+
+            await fetchMaintenances();
+            closeModal();
+            resetForm();
+        } catch (error) {
+            console.log('Error adding/updating maintenance:', error);
         }
-
-        closeModal();
-        resetForm();
     };
 
     const handleEditMaintenance = (maintenance) => {
         setSelectedMaintenance(maintenance);
-        setMaintenanceName(maintenance.asset.name);
+        setMaintenanceAsset({ value: maintenance.asset.id });
         setMaintenanceDate(maintenance.maintenance_date);
         setMaintenanceDesc(maintenance.description);
         setMaintenanceCost(maintenance.cost);
-        setMaintenancePerson(maintenance.technician.name);
+        setMaintenancePerson({ value: maintenance.technician.id });
         openModal();
+    };
+
+    const handleDeleteMaintenance = async (id) => {
+        if (confirm('Are you sure you want to delete this maintenance?')) {
+            try {
+                await deleteMaintenance(id);
+                await fetchMaintenances();
+            } catch (error) {
+                console.error('Error deleting maintenance:', error);
+            }
+        }
     };
 
     return (
@@ -90,7 +156,11 @@ export default function MaintenancePage() {
                         Add New Maintenance
                     </button>
 
-                    <MaintenanceTable onEditMaintenance={handleEditMaintenance} />
+                    <MaintenanceTable
+                        data={maintenances}
+                        onEditMaintenance={handleEditMaintenance}
+                        onDeleteMaintenance={handleDeleteMaintenance}
+                    />
                 </ComponentCard>
             </div>
 
@@ -108,17 +178,21 @@ export default function MaintenancePage() {
                     </h3>
                 </div>
 
-                <form action=''>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleAddOrUpdateMaintenance();
+                    }}>
                     <div>
                         <Label>
-                            Name <span className='text-error-500'>*</span>
+                            Asset <span className='text-error-500'>*</span>
                         </Label>
-                        <InputField
-                            type='text'
-                            id='name'
-                            value={maintenanceName}
-                            placeholder='Enter maintenance name'
-                            onChange={(e) => maintenanceName(e.target.value)}
+                        <Select
+                            placeholder='Select asset'
+                            // key={assets.id}
+                            options={assets}
+                            defaultValue={maintenanceAsset}
+                            onChange={(value) => setMaintenanceAsset(value)}
                         />
                     </div>
                     <div>
@@ -128,9 +202,10 @@ export default function MaintenancePage() {
                         <InputField
                             type='date'
                             id='maintenance_date'
+                            name='maintenance_date'
                             value={maintenanceDate}
                             placeholder='Enter maintenance date'
-                            onChange={(e) => maintenanceDate(e.target.value)}
+                            onChange={(e) => setMaintenanceDate(e.target.value)}
                         />
                     </div>
                     <div>
@@ -142,7 +217,7 @@ export default function MaintenancePage() {
                             id='description'
                             value={maintenanceDesc}
                             placeholder='Enter description'
-                            onChange={(e) => maintenanceDesc(e.target.value)}
+                            onChange={(e) => setMaintenanceDesc(e.target.value)}
                         />
                     </div>
                     <div>
@@ -154,19 +229,28 @@ export default function MaintenancePage() {
                             id='cost'
                             value={maintenanceCost}
                             placeholder='Enter maintenance cost'
-                            onChange={(e) => maintenanceCost(e.target.value)}
+                            onChange={(e) => setMaintenanceCost(e.target.value)}
                         />
                     </div>
                     <div>
                         <Label>
                             PIC <span className='text-error-500'>*</span>
                         </Label>
-                        <InputField
-                            type='text'
-                            id='technician'
+                        {/* <Select
+                            placeholder='Select person in charge'
+                            // key={persons.id}
+                            options={persons}
+                            defaultValue={maintenancePerson}
+                            onChange={(value) => setMaintenancePerson(value)}
+                        /> */}
+
+                        <AsyncSelect
+                            cacheOptions
+                            loadOptions={loadPersons}
+                            defaultOptions
                             value={maintenancePerson}
-                            placeholder='Enter person in charge'
-                            onChange={(e) => maintenancePerson(e.target.value)}
+                            onChange={(value) => setMaintenancePerson(value)}
+                            placeholder='Select person'
                         />
                     </div>
 
@@ -179,7 +263,9 @@ export default function MaintenancePage() {
                             className='px-4 py-2 border rounded text-gray-700'>
                             Cancel
                         </button>
-                        <button className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-700'>
+                        <button
+                            type='submit'
+                            className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-700'>
                             {selectedMaintenance ? 'Update' : 'Add'}
                         </button>
                     </div>

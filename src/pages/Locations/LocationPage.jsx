@@ -7,8 +7,13 @@ import LocationTable from '../../components/tables/LocationTable';
 import Modal from '../../components/ui/Modal';
 import Label from '../../components/form/Label';
 import InputField from '../../components/form/input/InputField';
-import { deleteLocation, getLocations, updateLocation } from '../../api/locationApi';
-import { createAsset } from '../../api/assetApi';
+import {
+    createLocation,
+    deleteLocation,
+    getLocations,
+    updateLocation,
+} from '../../api/locationApi';
+// import { createAsset } from '../../api/assetApi';
 
 export default function LocationPage() {
     const [locations, setLocations] = useState([]);
@@ -45,7 +50,7 @@ export default function LocationPage() {
             if (selectedLocation) {
                 await updateLocation(selectedLocation.id, locationData);
             } else {
-                await createAsset(locationData);
+                await createLocation(locationData);
             }
 
             await fetchLocations();
@@ -156,7 +161,9 @@ export default function LocationPage() {
                             className='px-4 py-2 border rounded text-gray-700'>
                             Cancel
                         </button>
-                        <button className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-600'>
+                        <button
+                            type='submit'
+                            className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-600'>
                             {selectedLocation ? 'Update' : 'Add'}
                         </button>
                     </div>

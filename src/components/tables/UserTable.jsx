@@ -1,43 +1,51 @@
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-
 import { useEffect, useRef } from 'react';
 
-export default function UserTable({ onEditUser, onDeleteUser, data }) {
+export default function UserTable({ onEditUser, onDeleteUser }) {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        if (!tableRef.current || !data || data.length === 0) return;
+        if (!tableRef.current) return;
+
         if ($.fn.DataTable.isDataTable(tableRef.current)) {
             $(tableRef.current).DataTable().destroy();
         }
 
-        $(tableRef.current).DataTable({
-            data: data,
+        const dataTable = $(tableRef.current).DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '/api/users',
+                type: 'GET',
+                dataSrc: function (json) {
+                    console.log('Data JSON:', json);
+                    return json.data;
+                },
+                error: function (xhr, error, thrown) {
+                    console.error('AJAX Error:', error, thrown);
+                },
+            },
             columns: [
                 {
+                    data: 'id',
+                    render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1,
+                    orderable: false,
                     title: 'No',
-                    data: null,
-                    className: 'text-start',
                     width: '5%',
-                    render: (data, type, row, meta) => {
-                        return `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${
-                            meta.row + 1
-                        }</div>`;
-                    },
                 },
                 {
                     title: 'Name',
                     data: 'name',
-                    width: '20%',
+                    width: '25%',
                     render: (data) =>
                         `<div class="text-sm font-medium text-gray-700 dark:text-white/90">${data}</div>`,
                 },
                 {
                     title: 'Email',
                     data: 'email',
-                    width: '20%',
+                    width: '25%',
                     render: (data) =>
                         `<a href="mailto:${data}" class="text-sm text-brand-500 dark:text-blue-400 hover:underline">${data}</a>`,
                 },
@@ -58,59 +66,29 @@ export default function UserTable({ onEditUser, onDeleteUser, data }) {
                     },
                 },
                 {
-                    title: 'Password',
-                    data: 'password',
-                    width: '20%',
-                    render: (data) =>
-                        `<div class="text-sm font-medium text-gray-700 dark:text-white/90">${data}</div>`,
-                },
-                {
-                    title: 'Action',
                     data: 'id',
-                    width: '15%',
+                    title: 'Action',
                     orderable: false,
+                    width: '15%',
                     render: (data, type, row) => `
-                        <div class="flex space-x-2">
-                            <button data-id="${row.id}" class="action-edit text-sm font-medium px-3 py-1 bg-brand-500 text-white rounded hover:bg-brand-700">Edit</button>
-                            <button data-id="${row.id}" class="action-delete text-sm font-medium px-3 py-1 bg-error-500 text-white rounded hover:bg-error-700">Delete</button>
-                        </div>
-                        `,
+                         <div class="flex space-x-2">
+                             <button data-id="${row.id}" class="action-edit text-sm font-medium px-3 py-1 bg-brand-500 text-white rounded hover:bg-brand-700">Edit</button>
+                             <button data-id="${row.id}" class="action-delete text-sm font-medium px-3 py-1 bg-error-500 text-white rounded hover:bg-error-700">Delete</button>
+                         </div>
+                         `,
                 },
             ],
-            responsive: true,
-            paging: true,
-            pageLength: 10,
-            lengthMenu: [5, 10, 25, 50, 100],
-            searching: true,
-            ordering: true,
-            info: true,
-            autoWidth: false,
-            dom: `<"flex justify-between items-center mb-4"<"flex-1"f><"flex-none"l>>rt<"flex justify-between items-center mt-4"<"flex-1"i><"flex-none"p>>`,
-            // dom: `<"flex justify-between items-center mb-4"<"flex-1"f><"flex-none"l>>rt<"flex justify-between items-center mt-4"<"flex-1"i><"flex-none"p>>`,
-
-            language: {
-                search: '_INPUT_',
-                searchPlaceholder: 'Search users...',
-                lengthMenu: 'Show _MENU_ users',
-                info: 'Showing _START_ to _END_ of _TOTAL_ users',
-                infoEmpty: 'No users found',
-                paginate: {
-                    first: 'First',
-                    last: 'Last',
-                    next: 'Next',
-                    previous: 'Previous',
-                },
-            },
             initComplete: function () {
                 const $table = $(tableRef.current);
 
-                // Tabel dasar
                 $table.addClass('min-w-full text-sm text-left');
 
                 $table.find('thead').addClass('bg-gray-50 dark:bg-white/[0.03]');
                 $table
                     .find('thead th')
-                    .addClass('px-5 py-3 font-medium text-gray-500 text-xs dark:text-gray-400');
+                    .addClass(
+                        'px-5 py-3 font-medium text-gray-500 text-xs text-center dark:text-gray-400'
+                    );
                 $table
                     .find('tbody td')
                     .addClass('px-5 py-4 text-sm text-gray-700 dark:text-gray-300');
@@ -145,32 +123,27 @@ export default function UserTable({ onEditUser, onDeleteUser, data }) {
             },
         });
 
+        //Event handlers
         $(tableRef.current).on('click', '.action-delete', function () {
             const userId = $(this).data('id');
-            console.log('Delete user : ', userId);
-            onDeleteUser(userId);
+            if (onDeleteUser) onDeleteUser(userId);
         });
+
         $(tableRef.current).on('click', '.action-edit', function () {
             const userId = $(this).data('id');
-            const selectedUser = data.find((user) => user.id === userId);
-            if (selectedUser) onEditUser(selectedUser);
+            const rowData = dataTable.row($(this).parents('tr')).data();
+            if (onEditUser) onEditUser(rowData);
         });
 
         return () => {
-            $(tableRef.current).off('click');
-            if ($.fn.DataTable.isDataTable(tableRef.current)) {
-                $(tableRef.current).DataTable().destroy();
-            }
+            $(tableRef.current).off();
+            dataTable.destroy();
         };
-    }, [data]);
+    }, []);
 
     return (
-        <div className='overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-gray-800'>
-            <div className='max-w-full overflow-x-auto px-2 py-2'>
-                <table className='display w-full' ref={tableRef}>
-                    {/* DataTables will inject content here */}
-                </table>
-            </div>
+        <div>
+            <table className='display' ref={tableRef}></table>
         </div>
     );
 }

@@ -9,10 +9,11 @@ import InputField from '../../components/form/input/InputField';
 import { useModal } from '../../hooks/useModal';
 import { PiEyeClosed } from 'react-icons/pi';
 import { FaEye } from 'react-icons/fa';
-import { deleteuser, getUsers } from '../../api/usersApi';
+import { createUser, deleteUser, getUsers, updateUser } from '../../api/usersApi';
 
 export default function UserPage() {
     const [users, setUsers] = useState([]);
+    const [draw, setDraw] = useState(1);
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [userPassword, setUserPassword] = useState('');
@@ -20,8 +21,33 @@ export default function UserPage() {
     const [selectedUser, setSelectedUser] = useState(null);
     const { isOpen, openModal, closeModal } = useModal();
 
+    // const reloadTable = () => setDraw((prev) => prev + 1);
+
+    // const handleAddOrUpdateUser = async () => {
+    //     const userData = { name: userName, email: userEmail, password: userPassword };
+    //     try {
+    //         if (selectedUser) await updateUser(selectedUser.id, userData);
+    //         else await createUser(userData);
+    //         reloadTable();
+    //         closeModal();
+    //         resetForm();
+    //     } catch (error) {
+    //         console.error('Error adding/updating user:', error);
+    //     }
+    // };
+
+    // const handleDeleteUser = async (id) => {
+    //     if (confirm('Are you sure want to delete this user?')) {
+    //         try {
+    //             await deleteuser(id);
+    //             reloadTable();
+    //         } catch (error) {
+    //             console.error('Failed to delete user', error);
+    //         }
+    //     }
+    // };
     useEffect(() => {
-        fetchUser();
+        // fetchUser();
     }, []);
 
     const fetchUser = async () => {
@@ -71,7 +97,7 @@ export default function UserPage() {
     const handleDeleteUser = async (id) => {
         if (confirm('Are you sure want to delete this asset?')) {
             try {
-                await deleteuser(id);
+                await deleteUser(id);
                 await fetchUser();
             } catch (error) {
                 console.log('Failed to delete user', error);
@@ -98,7 +124,8 @@ export default function UserPage() {
                         Add New User
                     </button>
                     <UserTable
-                        data={users}
+                        // data={users}
+                        // data={draw}
                         onDeleteUser={handleDeleteUser}
                         onEditUser={handleEditUser}
                     />

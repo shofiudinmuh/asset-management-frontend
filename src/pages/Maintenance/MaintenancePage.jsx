@@ -33,7 +33,7 @@ export default function MaintenancePage() {
     useEffect(() => {
         fetchMaintenances();
         fetchAssets();
-        fetchPerson();
+        // fetchPerson();
         loadPersons();
     }, []);
 
@@ -59,18 +59,18 @@ export default function MaintenancePage() {
         }
     };
 
-    const fetchPerson = async () => {
-        try {
-            const person = await getUsers();
-            const formattedPersons = person.data.data.data.map((person) => ({
-                value: person.id,
-                label: person.name,
-            }));
-            setPersons(formattedPersons);
-        } catch (error) {
-            console.log('Error fetching persons:', error);
-        }
-    };
+    // const fetchPerson = async () => {
+    //     try {
+    //         const person = await getUsers();
+    //         const formattedPersons = person.data.data.data.map((person) => ({
+    //             value: person.id,
+    //             label: person.name,
+    //         }));
+    //         setPersons(formattedPersons);
+    //     } catch (error) {
+    //         console.log('Error fetching persons:', error);
+    //     }
+    // };
 
     const loadPersons = async (inputValue) => {
         try {

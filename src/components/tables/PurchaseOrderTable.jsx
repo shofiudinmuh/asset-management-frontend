@@ -1,199 +1,30 @@
 import { useEffect, useRef } from 'react';
 import $ from 'jquery';
 
-const purchaseOrderData = [
-    {
-        id: 1,
-        order_date: '2025-04-01T00:00:00.000000Z',
-        total_soct: '250000.00',
-        status: 'completed',
-        created_at: '2025-04-01T08:00:00.000000Z',
-        updated_at: '2025-04-01T08:15:00.000000Z',
-        supplier: {
-            id: 1,
-            name: 'Alexander Arnold',
-            contact_person: 'Roberto Manchini',
-            phone: '09871243627',
-            email: 'trent-arnold@am.test',
-            address: 'Surabaya Timur',
-            created_at: '2025-03-29T14:37:40.000000Z',
-            updated_at: '2025-03-29T14:37:40.000000Z',
-        },
-    },
-    {
-        id: 2,
-        order_date: '2025-04-02T00:00:00.000000Z',
-        total_soct: '145000.00',
-        status: 'pending',
-        created_at: '2025-04-02T09:00:00.000000Z',
-        updated_at: '2025-04-02T09:30:00.000000Z',
-        supplier: {
-            id: 2,
-            name: 'Kevin De Bruyne',
-            contact_person: 'Vincent Kompany',
-            phone: '08123456789',
-            email: 'kevin@kdb.test',
-            address: 'Jakarta Barat',
-            created_at: '2025-03-30T10:00:00.000000Z',
-            updated_at: '2025-03-30T10:00:00.000000Z',
-        },
-    },
-    {
-        id: 3,
-        order_date: '2025-04-03T00:00:00.000000Z',
-        total_soct: '175500.00',
-        status: 'cancelled',
-        created_at: '2025-04-03T11:10:00.000000Z',
-        updated_at: '2025-04-03T11:40:00.000000Z',
-        supplier: {
-            id: 3,
-            name: 'Lionel Messi',
-            contact_person: 'Luis Enrique',
-            phone: '08211223344',
-            email: 'leo@messi.test',
-            address: 'Bandung',
-            created_at: '2025-03-28T09:00:00.000000Z',
-            updated_at: '2025-03-28T09:00:00.000000Z',
-        },
-    },
-    {
-        id: 4,
-        order_date: '2025-04-04T00:00:00.000000Z',
-        total_soct: '360000.00',
-        status: 'completed',
-        created_at: '2025-04-04T10:00:00.000000Z',
-        updated_at: '2025-04-04T10:15:00.000000Z',
-        supplier: {
-            id: 4,
-            name: 'Cristiano Ronaldo',
-            contact_person: 'Zinedine Zidane',
-            phone: '0833557799',
-            email: 'ronaldo@cr7.test',
-            address: 'Yogyakarta',
-            created_at: '2025-03-27T08:00:00.000000Z',
-            updated_at: '2025-03-27T08:00:00.000000Z',
-        },
-    },
-    {
-        id: 5,
-        order_date: '2025-04-05T00:00:00.000000Z',
-        total_soct: '195000.00',
-        status: 'pending',
-        created_at: '2025-04-05T12:00:00.000000Z',
-        updated_at: '2025-04-05T12:00:00.000000Z',
-        supplier: {
-            id: 5,
-            name: 'Neymar Jr',
-            contact_person: 'Tite',
-            phone: '08441231234',
-            email: 'neymar@brazil.test',
-            address: 'Surabaya',
-            created_at: '2025-03-26T13:00:00.000000Z',
-            updated_at: '2025-03-26T13:00:00.000000Z',
-        },
-    },
-    {
-        id: 6,
-        order_date: '2025-04-06T00:00:00.000000Z',
-        total_soct: '275000.00',
-        status: 'completed',
-        created_at: '2025-04-06T09:00:00.000000Z',
-        updated_at: '2025-04-06T09:10:00.000000Z',
-        supplier: {
-            id: 6,
-            name: 'Kylian Mbappe',
-            contact_person: 'Didier Deschamps',
-            phone: '0898777666',
-            email: 'mbappe@psg.test',
-            address: 'Malang',
-            created_at: '2025-03-25T12:00:00.000000Z',
-            updated_at: '2025-03-25T12:00:00.000000Z',
-        },
-    },
-    {
-        id: 7,
-        order_date: '2025-04-07T00:00:00.000000Z',
-        total_soct: '310000.00',
-        status: 'pending',
-        created_at: '2025-04-07T08:00:00.000000Z',
-        updated_at: '2025-04-07T08:30:00.000000Z',
-        supplier: {
-            id: 7,
-            name: 'Erling Haaland',
-            contact_person: 'Pep Guardiola',
-            phone: '08213131313',
-            email: 'haaland@mcfc.test',
-            address: 'Denpasar',
-            created_at: '2025-03-24T10:00:00.000000Z',
-            updated_at: '2025-03-24T10:00:00.000000Z',
-        },
-    },
-    {
-        id: 8,
-        order_date: '2025-04-08T00:00:00.000000Z',
-        total_soct: '130000.00',
-        status: 'cancelled',
-        created_at: '2025-04-08T14:00:00.000000Z',
-        updated_at: '2025-04-08T14:15:00.000000Z',
-        supplier: {
-            id: 8,
-            name: 'Harry Kane',
-            contact_person: 'Ange Postecoglou',
-            phone: '08778888999',
-            email: 'hkane@munich.test',
-            address: 'Semarang',
-            created_at: '2025-03-23T09:00:00.000000Z',
-            updated_at: '2025-03-23T09:00:00.000000Z',
-        },
-    },
-    {
-        id: 9,
-        order_date: '2025-04-09T00:00:00.000000Z',
-        total_soct: '225000.00',
-        status: 'completed',
-        created_at: '2025-04-09T11:30:00.000000Z',
-        updated_at: '2025-04-09T11:45:00.000000Z',
-        supplier: {
-            id: 9,
-            name: 'Sadio Mane',
-            contact_person: 'Aliou Cissé',
-            phone: '08110000001',
-            email: 'mane@senegal.test',
-            address: 'Makassar',
-            created_at: '2025-03-22T08:00:00.000000Z',
-            updated_at: '2025-03-22T08:00:00.000000Z',
-        },
-    },
-    {
-        id: 10,
-        order_date: '2025-04-10T00:00:00.000000Z',
-        total_soct: '180000.00',
-        status: 'pending',
-        created_at: '2025-04-10T15:00:00.000000Z',
-        updated_at: '2025-04-10T15:00:00.000000Z',
-        supplier: {
-            id: 10,
-            name: 'Luka Modric',
-            contact_person: 'Zlatko Dalić',
-            phone: '08133445566',
-            email: 'modric@rm.test',
-            address: 'Bekasi',
-            created_at: '2025-03-21T10:00:00.000000Z',
-            updated_at: '2025-03-21T10:00:00.000000Z',
-        },
-    },
-];
-
-export default function PurchaseOrder({ onEditPurchaseOrder, data }) {
+export default function PurchaseOrder({ onEditPurchaseOrder, onDeletePurchaseOrder }) {
     const tableRef = useRef(null);
 
     useEffect(() => {
+        if (!tableRef.current) return;
+
         if ($.fn.DataTable.isDataTable(tableRef.current)) {
             $(tableRef.current).DataTable().destroy();
         }
 
-        const $table = $(tableRef.current).DataTable({
-            data: purchaseOrderData,
+        const dataTable = $(tableRef.current).DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '/api/purchase-orders',
+                type: 'GET',
+                dataSrc: function (json) {
+                    console.log('Data JSON: ', json);
+                    return json.data;
+                },
+                error: function (xhr, error, thrown) {
+                    console.error('AJAX Error: ', error, thrown);
+                },
+            },
             columns: [
                 { title: 'No', data: 'id', className: 'text-start', width: '5%' },
                 {
@@ -313,31 +144,24 @@ export default function PurchaseOrder({ onEditPurchaseOrder, data }) {
 
         $(tableRef.current).on('click', '.action-delete', function () {
             const purchaseOrderId = $(this).data('id');
-            console.log('Delete purchase order : ', purchaseOrderId);
+            if (onDeletePurchaseOrder) onDeletePurchaseOrder(purchaseOrderId);
         });
 
         $(tableRef.current).on('click', '.action-edit', function () {
             const purchaseOrderId = $(this).data('id');
-            const selectedPurchaseOrder = purchaseOrderData.find(
-                (purchaseOrder) => purchaseOrder.id === purchaseOrderId
-            );
-            if (selectedPurchaseOrder) {
-                onEditPurchaseOrder(selectedPurchaseOrder);
-            }
+            const rowData = dataTable.row($(this).parents('tr')).data();
+            if (onEditPurchaseOrder) onEditPurchaseOrder(rowData);
         });
 
         return () => {
-            if ($.fn.DataTable.isDataTable(tableRef.current)) {
-                $table.destroy();
-            }
+            $(tableRef.current).off();
+            dataTable.destroy();
         };
     }, []);
 
     return (
-        <div className='overflow-hidden rounded-xl border border-gray-200 bg-white/[0.05] dark: bg-gray-800'>
-            <div className='max-w-full overflow-x-auto px-2 py-2'>
-                <table className='display w-full' ref={tableRef}></table>
-            </div>
+        <div>
+            <table className='display' ref={tableRef}></table>
         </div>
     );
 }

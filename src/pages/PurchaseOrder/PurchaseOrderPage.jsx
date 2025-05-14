@@ -7,9 +7,16 @@ import PurchaseOrderTable from '../../components/tables/PurchaseOrderTable';
 import Modal from '../../components/ui/Modal';
 import Label from '../../components/form/Label';
 import InputField from '../../components/form/input/InputField';
+import {
+    createPurchaseOrder,
+    deletePurchaseOrder,
+    updatePurchaseOrder,
+} from '../../api/purchaseOrderApi';
+import { get } from 'jquery';
+import { getSupplierSearch } from '../../api/supplierApi';
+import AsyncSelect from 'react-select/async';
 
 export default function PuchaseOrderPage() {
-    const [purchaseOrder, setPurchaseOrder] = useState([]);
     const [purchaseOrderDate, setPurchaseOrderDate] = useState('');
     const [purchaseOrderCost, setPurchaseOrderCost] = useState('');
     const [purchaseOrderSupplier, setPurchaseOrderSupplier] = useState('');
@@ -17,8 +24,19 @@ export default function PuchaseOrderPage() {
     const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState(null);
     const { isOpen, openModal, closeModal } = useModal();
 
+    const loadSupplier = async (inputValue) => {
+        try {
+            const suppliers = await getSupplierSearch(inputValue);
+            return suppliers.data.data.map((supplier) => ({
+                label: supplier.name,
+                value: supplier.id,
+            }));
+        } catch (error) {
+            console.error('Error fetching suppliers:', error);
+            return [];
+        }
+    };
     const resetForm = () => {
-        setPurchaseOrder('');
         setPurchaseOrderDate('');
         setPurchaseOrderCost('');
         setPurchaseOrderSupplier('');
@@ -26,35 +44,26 @@ export default function PuchaseOrderPage() {
         setSelectedPurchaseOrder('');
     };
 
-    const handleAddOrUpdatePurchaseOrder = () => {
-        if (selectedPurchaseOrder) {
-            // edit
-            setPurchaseOrder((prevPurchaseOrder) => {
-                prevPurchaseOrder.map((purchaseOrder) =>
-                    purchaseOrder.id === selectedPurchaseOrder.id
-                        ? {
-                              ...purchaseOrder,
-                              order_date: purchaseOrderDate,
-                              total_soct: purchaseOrderCost,
-                              supplier: purchaseOrderSupplier,
-                              status: purchaseOrderStatus,
-                          }
-                        : purchaseOrder
-                );
-            });
-        } else {
-            // create new purchase order
-            const newPurchaseOrder = {
-                order_date: purchaseOrderDate,
-                total_soct: purchaseOrderCost,
-                supplier: purchaseOrderSupplier,
-                status: purchaseOrderStatus,
-            };
+    const handleAddOrUpdatePurchaseOrder = async () => {
+        const purchaseOrderData = {
+            order_date: purchaseOrderDate,
+            total_soct: purchaseOrderCost,
+            supplier_id: purchaseOrderSupplier?.value ?? purchaseOrderSupplier,
+            status: purchaseOrderStatus,
+        };
 
-            setPurchaseOrder([...purchaseOrder, { ...newPurchaseOrder }]);
+        try {
+            if (selectedPurchaseOrder) {
+                await updatePurchaseOrder(selectedPurchaseOrder.id, purchaseOrderData);
+            } else {
+                await createPurchaseOrder(purchaseOrderData);
+            }
+
+            closeModal();
+            resetForm();
+        } catch (error) {
+            console.error('Error adding/updating purchase order:', error);
         }
-        closeModal();
-        resetForm();
     };
 
     const handleEditPurchaseOrder = (purchaseOrder) => {
@@ -64,6 +73,16 @@ export default function PuchaseOrderPage() {
         setPurchaseOrderSupplier(purchaseOrder.supplier.name);
         setPurchaseOrderStatus(purchaseOrder.status);
         openModal();
+    };
+
+    const handleDeletePurchaseOrder = async (id) => {
+        if (confirm('Are you sure you want to delete this purchase order?')) {
+            try {
+                await deletePurchaseOrder(id);
+            } catch (error) {
+                console.log('Error deleting purchase order:', error);
+            }
+        }
     };
 
     return (
@@ -83,7 +102,10 @@ export default function PuchaseOrderPage() {
                         Add New Purchase Order
                     </button>
 
-                    <PurchaseOrderTable onEditPurchaseOrder={handleEditPurchaseOrder} />
+                    <PurchaseOrderTable
+                        onEditPurchaseOrder={handleEditPurchaseOrder}
+                        onDeletePurchaseOrder={handleDeletePurchaseOrder}
+                    />
                 </ComponentCard>
             </div>
 
@@ -101,7 +123,11 @@ export default function PuchaseOrderPage() {
                         {selectedPurchaseOrder ? 'Edit Purchase Order' : 'Add Purchase Order'}
                     </h3>
                 </div>
-                <form action=''>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleAddOrUpdatePurchaseOrder();
+                    }}>
                     <div>
                         <Label>
                             Order Date <span className='text-error-500'>*</span>
@@ -112,7 +138,7 @@ export default function PuchaseOrderPage() {
                             name='order_date'
                             value={purchaseOrderDate}
                             placeholder='Choose date'
-                            onChange={(e) => purchaseOrderDate(e.target.value)}
+                            onChange={(e) => setPurchaseOrderDate(e.target.value)}
                         />
                     </div>
                     <div>
@@ -120,25 +146,34 @@ export default function PuchaseOrderPage() {
                             Total Cost<span className='text-error-500'>*</span>
                         </Label>
                         <InputField
-                            type='numeric'
+                            type='number'
                             id='total_soct'
                             name='total_soct'
                             value={purchaseOrderCost}
                             placeholder='Enter total cost'
-                            onChange={(e) => purchaseOrderCost(e.target.value)}
+                            onChange={(e) => setPurchaseOrderCost(e.target.value)}
                         />
                     </div>
                     <div>
                         <Label>
                             Supplier<span className='text-error-500'>*</span>
                         </Label>
-                        <InputField
+                        {/* <InputField
                             type='text'
                             id='supplier'
                             name='supplier'
                             value={purchaseOrderSupplier}
                             placeholder='Enter supplier'
                             onChange={(e) => setPurchaseOrderSupplier(e.target.value)}
+                        /> */}
+
+                        <AsyncSelect
+                            cacheOptions
+                            loadOptions={loadSupplier}
+                            defaultOptions
+                            value={purchaseOrderSupplier}
+                            onChange={(value) => setPurchaseOrderSupplier(value)}
+                            placeholder='Select supplier'
                         />
                     </div>
                     <div>
@@ -151,7 +186,7 @@ export default function PuchaseOrderPage() {
                             name='status'
                             value={purchaseOrderStatus}
                             placeholder='Choose status'
-                            onChange={(e) => purchaseOrderStatus(e.target.value)}
+                            onChange={(e) => setPurchaseOrderStatus(e.target.value)}
                         />
                     </div>
 
@@ -164,7 +199,9 @@ export default function PuchaseOrderPage() {
                             className='px-4 py-2 border rounded text-gray-700'>
                             Cancel
                         </button>
-                        <button className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-700'>
+                        <button
+                            type='submit'
+                            className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-700'>
                             {selectedPurchaseOrder ? 'Update' : 'Add'}
                         </button>
                     </div>

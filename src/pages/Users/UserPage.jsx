@@ -21,43 +21,6 @@ export default function UserPage() {
     const [selectedUser, setSelectedUser] = useState(null);
     const { isOpen, openModal, closeModal } = useModal();
 
-    // const reloadTable = () => setDraw((prev) => prev + 1);
-
-    // const handleAddOrUpdateUser = async () => {
-    //     const userData = { name: userName, email: userEmail, password: userPassword };
-    //     try {
-    //         if (selectedUser) await updateUser(selectedUser.id, userData);
-    //         else await createUser(userData);
-    //         reloadTable();
-    //         closeModal();
-    //         resetForm();
-    //     } catch (error) {
-    //         console.error('Error adding/updating user:', error);
-    //     }
-    // };
-
-    // const handleDeleteUser = async (id) => {
-    //     if (confirm('Are you sure want to delete this user?')) {
-    //         try {
-    //             await deleteuser(id);
-    //             reloadTable();
-    //         } catch (error) {
-    //             console.error('Failed to delete user', error);
-    //         }
-    //     }
-    // };
-    useEffect(() => {
-        // fetchUser();
-    }, []);
-
-    const fetchUser = async () => {
-        try {
-            const response = await getUsers();
-            setUsers(response.data.data.data);
-        } catch (error) {
-            console.error('Error fetching users:', error);
-        }
-    };
     const resetForm = () => {
         setUserName('');
         setUserEmail('');
@@ -79,7 +42,7 @@ export default function UserPage() {
                 await createUser(userData);
             }
 
-            await fetchUser();
+            // await fetchUser();
             closeModal();
             resetForm();
         } catch (error) {
@@ -98,7 +61,7 @@ export default function UserPage() {
         if (confirm('Are you sure want to delete this asset?')) {
             try {
                 await deleteUser(id);
-                await fetchUser();
+                // await fetchUser();
             } catch (error) {
                 console.log('Failed to delete user', error);
             }
@@ -123,12 +86,7 @@ export default function UserPage() {
                         }}>
                         Add New User
                     </button>
-                    <UserTable
-                        // data={users}
-                        // data={draw}
-                        onDeleteUser={handleDeleteUser}
-                        onEditUser={handleEditUser}
-                    />
+                    <UserTable onDeleteUser={handleDeleteUser} onEditUser={handleEditUser} />
                 </ComponentCard>
             </div>
 

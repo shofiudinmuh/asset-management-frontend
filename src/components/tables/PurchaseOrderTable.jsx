@@ -26,7 +26,13 @@ export default function PurchaseOrder({ onEditPurchaseOrder, onDeletePurchaseOrd
                 },
             },
             columns: [
-                { title: 'No', data: 'id', className: 'text-start', width: '5%' },
+                {
+                    data: 'id',
+                    render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1,
+                    orderable: false,
+                    title: 'No',
+                    width: '5%',
+                },
                 {
                     title: 'Order Date',
                     data: 'order_date',
@@ -58,10 +64,10 @@ export default function PurchaseOrder({ onEditPurchaseOrder, onDeletePurchaseOrd
                 },
                 {
                     title: 'Supplier',
-                    data: 'supplier',
+                    data: 'supplier_name',
                     width: '15%',
-                    render: (supplier) =>
-                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${supplier.name}</div>`,
+                    render: (data) =>
+                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${data}</div>`,
                 },
                 {
                     title: 'Status',

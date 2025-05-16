@@ -158,14 +158,6 @@ export default function PuchaseOrderPage() {
                         <Label>
                             Supplier<span className='text-error-500'>*</span>
                         </Label>
-                        {/* <InputField
-                            type='text'
-                            id='supplier'
-                            name='supplier'
-                            value={purchaseOrderSupplier}
-                            placeholder='Enter supplier'
-                            onChange={(e) => setPurchaseOrderSupplier(e.target.value)}
-                        /> */}
 
                         <AsyncSelect
                             cacheOptions

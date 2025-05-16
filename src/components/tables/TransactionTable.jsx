@@ -1,141 +1,69 @@
 import $ from 'jquery';
 import { useEffect, useRef } from 'react';
 
-const transactionData = [
-    {
-        id: 1,
-        asset: {
-            id: 2,
-            name: 'Server',
-            category: 'Peralatan',
-            serial_number: 'JKDNFAOI12335JNAKJDN12',
-            purchase_date: '2025-03-30T00:00:00.000000Z',
-            warranty_expiry: '2027-03-30T00:00:00.000000Z',
-            status: 'Tersedia',
-            created_at: '2025-04-06T06:41:17.000000Z',
-            updated_at: '2025-04-06T06:41:17.000000Z',
-        },
-        user: {
-            id: 2,
-            name: 'User Baru',
-            email: 'user2@am.test',
-            created_at: '2025-03-29 07:32:04',
-        },
-        transaction_type: 'Pinjam',
-        transaction_date: '2025-03-06T00:00:00.000000Z',
-        location: {
-            id: 4,
-            name: 'Surabaya 4',
-            address: 'Jalan Ir Soekarno No 19',
-            created_at: '2025-03-30T05:02:08.000000Z',
-            update_at: '2025-03-30T05:02:08.000000Z',
-        },
-        created_at: '2025-04-06T07:50:18.000000Z',
-        updated_at: '2025-04-06T07:50:18.000000Z',
-    },
-    {
-        id: 2,
-        asset: {
-            id: 2,
-            name: 'Server',
-            category: 'Peralatan',
-            serial_number: 'JKDNFAOI12335JNAKJDN12',
-            purchase_date: '2025-03-30T00:00:00.000000Z',
-            warranty_expiry: '2027-03-30T00:00:00.000000Z',
-            status: 'Tersedia',
-            created_at: '2025-04-06T06:41:17.000000Z',
-            updated_at: '2025-04-06T06:41:17.000000Z',
-        },
-        user: {
-            id: 2,
-            name: 'User Baru',
-            email: 'user2@am.test',
-            created_at: '2025-03-29 07:32:04',
-        },
-        transaction_type: 'Pinjam',
-        transaction_date: '2025-03-06T00:00:00.000000Z',
-        location: {
-            id: 4,
-            name: 'Surabaya 4',
-            address: 'Jalan Ir Soekarno No 19',
-            created_at: '2025-03-30T05:02:08.000000Z',
-            update_at: '2025-03-30T05:02:08.000000Z',
-        },
-        created_at: '2025-04-06T07:50:53.000000Z',
-        updated_at: '2025-04-06T07:50:53.000000Z',
-    },
-    {
-        id: 3,
-        asset: {
-            id: 2,
-            name: 'Server',
-            category: 'Peralatan',
-            serial_number: 'JKDNFAOI12335JNAKJDN12',
-            purchase_date: '2025-03-30T00:00:00.000000Z',
-            warranty_expiry: '2027-03-30T00:00:00.000000Z',
-            status: 'Tersedia',
-            created_at: '2025-04-06T06:41:17.000000Z',
-            updated_at: '2025-04-06T06:41:17.000000Z',
-        },
-        user: {
-            id: 4,
-            name: 'User Test 4',
-            email: 'user-test4@am.test',
-            created_at: '2025-03-29 14:21:50',
-        },
-        transaction_type: 'Pinjam',
-        transaction_date: '2025-03-06T00:00:00.000000Z',
-        location: {
-            id: 4,
-            name: 'Surabaya 4',
-            address: 'Jalan Ir Soekarno No 19',
-            created_at: '2025-03-30T05:02:08.000000Z',
-            update_at: '2025-03-30T05:02:08.000000Z',
-        },
-        created_at: '2025-04-06T07:51:40.000000Z',
-        updated_at: '2025-04-06T07:51:40.000000Z',
-    },
-];
-
-export default function TransactionTable({ onEditTransaction, data }) {
+export default function TransactionTable({
+    onEditTransaction,
+    onDeleteTransaction,
+    refreshTrigger,
+}) {
     const tableRef = useRef(null);
+    const dataTableRef = useRef(null);
 
     useEffect(() => {
+        if (!tableRef.current) return;
         if ($.fn.DataTable.isDataTable(tableRef.current)) {
             $(tableRef.current).DataTable().destroy();
         }
 
-        const $table = $(tableRef.current).DataTable({
-            data: transactionData,
+        const dataTable = $(tableRef.current).DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '/api/transactions',
+                type: 'GET',
+                dataSrc: function (json) {
+                    console.log('Data JSON: ', json);
+                    return json.data;
+                },
+                error: function (xhr, error, thrown) {
+                    console.error('AJAX Error: ', error, thrown);
+                },
+            },
             columns: [
-                { title: 'No', data: 'id', width: '5%', className: 'text-start text-sm' },
+                {
+                    data: 'id',
+                    render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1,
+                    orderable: false,
+                    title: 'No',
+                    width: '5%',
+                },
                 {
                     title: 'Name',
-                    data: 'asset',
+                    data: 'asset_name',
                     width: '15%',
-                    render: (asset) =>
-                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${asset.name}</div>`,
+                    render: (data) =>
+                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${data}</div>`,
                 },
                 {
                     title: 'Serial Number',
-                    data: 'asset',
+                    data: 'asset_number',
                     width: '15%',
-                    render: (asset) =>
-                        `<div class='test-sm font-medium text-gray-700 dark:text-white/90'>${asset.serial_number}</div>`,
+                    render: (data) =>
+                        `<div class='test-sm font-medium text-gray-700 dark:text-white/90'>${data}</div>`,
                 },
                 {
                     title: 'User',
-                    data: 'user',
+                    data: 'user_name',
                     width: '15%',
-                    render: (user) =>
-                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${user.name}</div>`,
+                    render: (data) =>
+                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${data}</div>`,
                 },
                 {
                     title: 'Location',
-                    data: 'location',
+                    data: 'location_name',
                     width: '15%',
-                    render: (location) =>
-                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${location.name}</div>`,
+                    render: (data) =>
+                        `<div class='text-sm font-medium text-gray-700 dark:text-white/90'>${data}</div>`,
                 },
                 {
                     title: 'Transaction Type',
@@ -163,7 +91,7 @@ export default function TransactionTable({ onEditTransaction, data }) {
                 {
                     title: 'Action',
                     data: 'id',
-                    width: '10%',
+                    width: '15%',
                     render: (data, type, row) =>
                         `<div className='flex space-x-2'>
                             <button data-id='${row.id}' class='action-edit text-sm font-medium px-3 py-1 bg-brand-500 text-white hover:bg-brand-700 rounded'>Edit</button>
@@ -232,27 +160,33 @@ export default function TransactionTable({ onEditTransaction, data }) {
             },
         });
 
+        dataTableRef.current = dataTable;
+
         $(tableRef.current).on('click', '.action-delete', function () {
             const transactionId = $(this).data('id');
-            console.log('Delete transactions : ', transactionId);
+            if (onDeleteTransaction) onDeleteTransaction(transactionId);
+            if (dataTableRef.current) {
+                dataTableRef.current.ajax.reload(null, false);
+            }
         });
 
         $(tableRef.current).on('click', '.action-edit', function () {
             const transactionId = $(this).data('id');
-            const selectedTransaction = transactionData.find(
-                (transaction) => transaction.id === transactionId
-            );
-            if (selectedTransaction) {
-                onEditTransaction(selectedTransaction);
-            }
+            const rowData = dataTable.row($(this).parents('tr')).data();
+            if (onEditTransaction) onEditTransaction(rowData);
         });
 
         return () => {
-            if ($.fn.DataTable.isDataTable(tableRef.current)) {
-                $table.destroy();
-            }
+            $(tableRef.current).off();
+            dataTable.destroy();
         };
     }, []);
+
+    useEffect(() => {
+        if (dataTableRef.current) {
+            dataTableRef.current.ajax.reload(null, false);
+        }
+    });
 
     return (
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white/[0.05]'>

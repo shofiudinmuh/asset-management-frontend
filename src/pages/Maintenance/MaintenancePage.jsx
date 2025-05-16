@@ -34,7 +34,7 @@ export default function MaintenancePage() {
         fetchMaintenances();
         fetchAssets();
         // fetchPerson();
-        loadPersons();
+        // loadPersons();
     }, []);
 
     const fetchMaintenances = async () => {

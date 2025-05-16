@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useModal } from '../../hooks/useModal';
 import PageMeta from '../../components/common/PageMeta';
 import TransactionTable from '../../components/tables/TransactionTable';
@@ -7,6 +7,12 @@ import Label from '../../components/form/Label';
 import Modal from '../../components/ui/Modal';
 import ComponentCard from '../../components/common/ComponentCard';
 import PageBreadCrumb from '../../components/common/PageBreadCrumb';
+import { createTransaction, deleteTransaction, updateTransaction } from '../../api/transactionApi';
+import { getAssetSearch } from '../../api/assetApi';
+import { getLocationSearch } from '../../api/locationApi';
+import AsyncSelect from 'react-select/async';
+import { getUserSearch } from '../../api/usersApi';
+import Select from '../../components/form/Select';
 
 export default function TransactionPage() {
     const [transaction, setTransaction] = useState([]);
@@ -14,11 +20,50 @@ export default function TransactionPage() {
     const [transactionUser, setTransactionUser] = useState('');
     const [transactionLocation, setTransactionLocation] = useState('');
     const [transactionDate, setTransactionDate] = useState('');
+    const [transactionType, setTransactionType] = useState('');
     const [selectedTransaction, setSelectedTransaction] = useState(null);
     const { isOpen, openModal, closeModal } = useModal();
 
+    const loadPersons = async (inputValue) => {
+        try {
+            const response = await getUserSearch(inputValue);
+            return response.data.data.map((user) => ({
+                value: user.id,
+                label: user.name,
+            }));
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            return [];
+        }
+    };
+
+    const loadAssets = async (inputValue) => {
+        try {
+            const response = await getAssetSearch(inputValue);
+            return response.data.data.map((asset) => ({
+                value: asset.id,
+                label: asset.name,
+            }));
+        } catch (error) {
+            console.error('Error fetching assets:', error);
+            return [];
+        }
+    };
+
+    const loadLocations = async (inputValue) => {
+        try {
+            const response = await getLocationSearch(inputValue);
+            return response.data.data.map((location) => ({
+                value: location.id,
+                label: location.name,
+            }));
+        } catch (error) {
+            console.error('Error fetching locations:', error);
+            return [];
+        }
+    };
+
     const resetForm = () => {
-        setTransaction('');
         setTransactionName('');
         setTransactionUser('');
         setTransactionLocation('');
@@ -26,44 +71,50 @@ export default function TransactionPage() {
         setTransactionDate('');
     };
 
-    const handleAddOrUpdateTransaction = () => {
-        if (selectedTransaction) {
-            //
-            setTransaction((prevTransaction) => {
-                prevTransaction.map((transaction) =>
-                    transaction.id === selectedTransaction.id
-                        ? {
-                              ...transaction,
-                              asset: transactionName,
-                              user: transactionUser,
-                              location: transactionLocation,
-                              transaction_date: transactionDate,
-                          }
-                        : transaction
-                );
-            });
-        } else {
-            // create new transaction
-            const newTransaction = {
-                asset: transactionName,
-                user: transactionName,
-                location: transactionLocation,
-                transaction_date: transactionDate,
-            };
-            setTransaction([...transaction, { ...newTransaction }]);
-        }
+    const handleAddOrUpdateTransaction = async () => {
+        const transactionData = {
+            asset_id: transactionName?.value ?? transactionName,
+            user_id: transactionUser?.value ?? transactionUser,
+            transaction_type: transactionType,
+            transaction_date: transactionDate,
+            location_id: transactionLocation?.value ?? transactionLocation,
+        };
 
-        closeModal();
-        resetForm();
+        try {
+            if (selectedTransaction) {
+                await updateTransaction(selectedTransaction.id, transactionData);
+            } else {
+                await createTransaction(transactionData);
+            }
+
+            closeModal();
+            resetForm();
+        } catch (error) {
+            console.error('Error adding/updating transaction:', error);
+        }
     };
 
     const handleEditTransaction = (transaction) => {
         setSelectedTransaction(transaction);
-        setTransactionName(transaction.asset.name);
-        setTransactionUser(transaction.user.name);
-        setTransactionLocation(transaction.location.name);
+        setTransactionName({ value: transaction.asset.id, label: transaction.asset.name });
+        setTransactionUser({ value: transaction.user_id, label: transaction.user.name });
+        setTransactionType(transaction.transaction_type);
+        setTransactionLocation({
+            value: transaction.location_id,
+            label: transaction.location.name,
+        });
         setTransactionDate(transaction.transaction_date);
         openModal();
+    };
+
+    const handleDeleteTransaction = async (id) => {
+        if (confirm('Are you sure you want to delete this transaction?')) {
+            try {
+                await deleteTransaction(id);
+            } catch (error) {
+                console.log('Failed to delete transaction', error);
+            }
+        }
     };
 
     return (
@@ -83,7 +134,10 @@ export default function TransactionPage() {
                         Add New Transaction
                     </button>
 
-                    <TransactionTable onEditTransaction={handleEditTransaction} />
+                    <TransactionTable
+                        onEditTransaction={handleEditTransaction}
+                        onDeleteTransaction={handleDeleteTransaction}
+                    />
                 </ComponentCard>
             </div>
 
@@ -99,46 +153,66 @@ export default function TransactionPage() {
                         {selectedTransaction ? 'Edit Transaction' : 'Add Transaction'}
                     </h3>
                 </div>
-                <form action=''>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleAddOrUpdateTransaction();
+                    }}>
                     <div>
                         <Label>
                             Name <span className='text-error-500'>*</span>
                         </Label>
-                        <InputField
-                            type='text'
-                            id='asset'
-                            name='asset'
+                        <AsyncSelect
+                            cacheOptions
+                            loadOptions={loadAssets}
+                            defaultOptions
                             value={transactionName}
-                            placeholder='Enter asset name'
-                            onChange={(e) => transactionName(e.target.value)}
+                            onChange={(value) => setTransactionName(value)}
+                            placeholder='Select asset'
                         />
                     </div>
                     <div>
                         <Label>
                             User<span className='text-error-500'>*</span>
                         </Label>
-                        <InputField
-                            type='text'
-                            id='user'
-                            name='user'
+                        <AsyncSelect
+                            cacheOptions
+                            loadOptions={loadPersons}
+                            defaultOptions
                             value={transactionUser}
-                            placeholder='Enter user'
-                            onChange={(e) => transactionUser(e.target.value)}
+                            onChange={(value) => setTransactionUser(value)}
+                            placeholder='Select user'
                         />
                     </div>
                     <div>
                         <Label>
                             Location<span className='text-error-500'>*</span>
                         </Label>
-                        <InputField
-                            type='text'
-                            id='location'
-                            name='location'
+                        <AsyncSelect
+                            cacheOptions
+                            loadOptions={loadLocations}
+                            defaultOptions
                             value={transactionLocation}
-                            placeholder='Enter location'
-                            onChange={(e) => transactionLocation(e.target.value)}
+                            onChange={(value) => setTransactionLocation(value)}
+                            placeholder='Select location'
                         />
                     </div>
+                    <div>
+                        <Label>
+                            Type<span className='text-error-500'>*</span>
+                        </Label>
+                        <Select
+                            options={[
+                                { value: 'Pinjam', label: 'Pinjam' },
+                                { value: 'Kembalikan', label: 'Kembalikan' },
+                                { value: 'Transfer', label: 'Transfer' },
+                            ]}
+                            placeholder='Select type'
+                            defaultValue={transactionType}
+                            onChange={(value) => setTransactionType(value)}
+                        />
+                    </div>
+
                     <div>
                         <Label>
                             Transaction Date<span className='text-error-500'>*</span>
@@ -147,9 +221,9 @@ export default function TransactionPage() {
                             type='date'
                             id='transaction_date'
                             name='transaction_date'
-                            value={setTransactionDate}
+                            value={transactionDate}
                             placeholder='Choose date'
-                            onChange={(e) => transactionDate(e.target.value)}
+                            onChange={(e) => setTransactionDate(e.target.value)}
                         />
                     </div>
 
@@ -162,7 +236,9 @@ export default function TransactionPage() {
                             className='px-4 py-2 border rounded text-gray-700'>
                             Cancel
                         </button>
-                        <button className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-700'>
+                        <button
+                            type='submit'
+                            className='px-4 py-2 bg-brand-500 text-white rounded hover:bg-brand-700'>
                             {selectedTransaction ? 'Update' : 'Add'}
                         </button>
                     </div>

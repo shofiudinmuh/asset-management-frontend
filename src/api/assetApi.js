@@ -6,3 +6,7 @@ export const getAssets = () => api.get(API_PATH);
 export const createAsset = (data) => api.post(API_PATH, data);
 export const updateAsset = (id, data) => api.put(`${API_PATH}/${id}`, data);
 export const deleteAsset = (id) => api.delete(`${API_PATH}/${id}`);
+export const getAssetSearch = (query) =>
+    api.get(`${API_PATH}/search`, {
+        params: { q: query },
+    });

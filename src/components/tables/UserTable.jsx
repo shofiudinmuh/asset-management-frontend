@@ -1,10 +1,11 @@
 import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-import { useEffect, useRef } from 'react';
+import { use, useEffect, useRef } from 'react';
 
-export default function UserTable({ onEditUser, onDeleteUser }) {
+export default function UserTable({ onEditUser, onDeleteUser, refreshTrigger }) {
     const tableRef = useRef(null);
+    const dataTableRef = useRef(null);
 
     useEffect(() => {
         if (!tableRef.current) return;
@@ -123,6 +124,7 @@ export default function UserTable({ onEditUser, onDeleteUser }) {
             },
         });
 
+        dataTableRef.current = dataTable;
         //Event handlers
         $(tableRef.current).on('click', '.action-delete', function () {
             const userId = $(this).data('id');
@@ -140,6 +142,12 @@ export default function UserTable({ onEditUser, onDeleteUser }) {
             dataTable.destroy();
         };
     }, []);
+
+    useEffect(() => {
+        if (dataTableRef.current) {
+            dataTableRef.current.ajax.reload(null, false);
+        }
+    });
 
     return (
         <div>
